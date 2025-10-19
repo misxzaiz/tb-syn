@@ -30,6 +30,7 @@ public class SynController {
 
     public static String REDIS_KEY_PREFIX = "tb:syn:config:cid:";
     public static String REDIS_QUEUE_PREFIX = "tb:syn:queue:cid:";
+    public static String REDIS_BAK_QUEUE_PREFIX = "tb:syn:bak:queue:cid:";
 
     private static RandleData randleData = new RandleData();
 
@@ -83,7 +84,7 @@ public class SynController {
         // 3. push数据到Redis队列
         if (resp.getDatas() != null && !resp.getDatas().isEmpty()) {
             List<PurchaseInDTO> dataList = resp.getDatas();
-            leftPush(cid, dataList);
+            leftPush(REDIS_QUEUE_PREFIX, cid, dataList);
         }
 
         // 修改最后更新时间
@@ -94,8 +95,15 @@ public class SynController {
         return resp;
     }
 
-    private void leftPush(String cid, List<PurchaseInDTO> dataList) {
-        String queueKey = REDIS_QUEUE_PREFIX + cid;
+    private void leftPush(String prefix, String cid, PurchaseInDTO data) {
+        String queueKey = prefix + cid;
+
+        // 将数据推送到Redis队列
+        redisTemplate.opsForList().leftPush(queueKey, data);
+    }
+
+    private void leftPush(String prefix, String cid, List<PurchaseInDTO> dataList) {
+        String queueKey = prefix + cid;
 
         // 将数据推送到Redis队列
         redisTemplate.opsForList().leftPushAll(queueKey, dataList);
@@ -112,17 +120,8 @@ public class SynController {
         return Optional.ofNullable(StrUtil.isBlank(json) ? null : JSONUtil.toBean(json, TbSynConfigDTO.class));
     }
 
-    private PurchaseInDTO right(String cid) {
-        String queueKey = REDIS_QUEUE_PREFIX + cid;
-
-//        redisTemplate.opsForList().
-        // 将数据推送到Redis队列
-        PurchaseInDTO o = redisTemplate.opsForList().rightPop(queueKey);
-        return o;
-    }
-
-    private PurchaseInDTO rightPop(String cid) {
-        String queueKey = REDIS_QUEUE_PREFIX + cid;
+    private PurchaseInDTO rightPop(String prefix, String cid) {
+        String queueKey = prefix + cid;
 
         // 将数据推送到Redis队列
         PurchaseInDTO o = redisTemplate.opsForList().rightPop(queueKey);
@@ -137,9 +136,32 @@ public class SynController {
      */
     @RequestMapping("/popDate")
     public Object popDate(@RequestParam String cid) {
-        PurchaseInDTO purchaseInDTO = rightPop(cid);
+        PurchaseInDTO purchaseInDTO = rightPop(REDIS_QUEUE_PREFIX, cid);
+
+        if (purchaseInDTO == null) {
+            rightPop(REDIS_BAK_QUEUE_PREFIX, cid);
+            return "数据同步";
+        }
+
+        bakData(REDIS_BAK_QUEUE_PREFIX + purchaseInDTO.getIoId() + ":", cid, purchaseInDTO.getIoId() + ":" + purchaseInDTO.getUpdateTime(), purchaseInDTO);
+
+        System.out.println(purchaseInDTO);
+
+        removeBakData(REDIS_BAK_QUEUE_PREFIX + purchaseInDTO.getIoId() + ":", cid, purchaseInDTO.getIoId() + ":" + purchaseInDTO.getUpdateTime());
 
         return purchaseInDTO;
+    }
+
+    public void bakData(String prefix, String cid, String key, PurchaseInDTO data) {
+        String queueKey = prefix + cid;
+
+        redisTemplate.opsForHash().put(queueKey, key, data);
+    }
+
+    public void removeBakData(String prefix, String cid, String key) {
+        String queueKey = prefix + cid;
+
+        redisTemplate.opsForHash().delete(queueKey, key);
     }
 
 
