@@ -18,7 +18,7 @@ public class RandleData {
     private static final SimpleRateLimiter limiter = new SimpleRateLimiter(1000, 3);
     
     // 默认最大数据条数
-    private static final int DEFAULT_MAX_COUNT = 500;
+    private static final int DEFAULT_MAX_COUNT = 10;
     // 可配置的最大数据条数
     private int maxDataCount = DEFAULT_MAX_COUNT;
 
