@@ -22,35 +22,28 @@ public abstract class AbstractSyncTemplate<T> {
     protected SynQueueService<T> synQueueService;
     
     public final String syncData(String cid) {
-        TbSynConfigDTO tbSynConfigDTO = synConfigService.getTbSynConfigDTO(cid).orElse(TbSynConfigDTO.init(cid));
+        TbSynConfigDTO config = synConfigService.getTbSynConfigDTO(cid).orElse(TbSynConfigDTO.init(cid));
         
-        if (TbSynConfigDTO.SYN_TWO.equals(tbSynConfigDTO.getSynState())) {
-            tbSynConfigDTO.setSynState(TbSynConfigDTO.SYN_ONE);
-            synConfigService.saveTbSynConfigDTO(tbSynConfigDTO);
+        if (TbSynConfigDTO.SYN_TWO.equals(config.getSynState())) {
+            config.setSynState(TbSynConfigDTO.SYN_ONE);
+            synConfigService.saveTbSynConfigDTO(config);
             return "初始化同步配置信息...";
         }
         
-        TbPageReqDTO pageReq = buildPageRequest(tbSynConfigDTO);
-
-        tbSynConfigDTO.setBeginSynTime(pageReq.getModifyBeginTime());
-        tbSynConfigDTO.setEndSynTime(pageReq.getModifyEndTime());
-        tbSynConfigDTO.setSynState(TbSynConfigDTO.SYN_THREE);
-        synConfigService.saveTbSynConfigDTO(tbSynConfigDTO);
+        TbPageReqDTO pageReq = buildPageRequest(config);
+        updateSyncConfigForSyncing(config, pageReq);
 
         if (TbPageReqDTO.SYN_TWO.equals(pageReq.getIsSyn())) {
             return "同步时间未到达，等待中...";
         }
-        TbTotalPageDTO<T> resp = fetchData(pageReq);
         
-        if (resp.getDatas() != null && !resp.getDatas().isEmpty()) {
-            List<T> dataList = resp.getDatas();
-            synQueueService.leftPush(SynQueueService.REDIS_QUEUE_PREFIX, cid, dataList);
-        }
+        TbTotalPageDTO<T> response = fetchData(pageReq);
+        pushDataToQueue(response, cid);
+        
+        config.setSynState(TbSynConfigDTO.SYN_ONE);
+        synConfigService.saveTbSynConfigDTO(config);
 
-        tbSynConfigDTO.setSynState(TbSynConfigDTO.SYN_ONE);
-        synConfigService.saveTbSynConfigDTO(tbSynConfigDTO);
-
-        return resp.toString();
+        return response.toString();
     }
 
     public final Object popData(String cid, Consumer<T> dataConsumer) {
@@ -61,28 +54,16 @@ public abstract class AbstractSyncTemplate<T> {
             return "数据同步";
         }
         
-        String backupKey = generateBackupKey(data);
-        synQueueService.bakData(SynQueueService.REDIS_BAK_QUEUE_PREFIX + getBackupPrefix(data) + ":", 
-                cid, 
-                backupKey, 
-                data);
-        
-        if (dataConsumer != null) {
-            dataConsumer.accept(data);
-        }
-        
-        synQueueService.removeBakData(SynQueueService.REDIS_BAK_QUEUE_PREFIX + getBackupPrefix(data) + ":", 
-                cid, 
-                backupKey);
+        processDataWithBackup(data, cid, dataConsumer);
         
         return data;
     }
     
     protected TbPageReqDTO buildPageRequest(TbSynConfigDTO config) {
-        boolean noNextTime = TbSynConfigDTO.SYN_TWO.equals(config.getSynState()) || TbSynConfigDTO.SYN_THREE.equals(config.getSynState());
+        boolean isFirstSync = isInitialState(config.getSynState());
         return TbPageReqDTO.builder()
-                .modifyBeginTime(noNextTime ? config.getBeginSynTime() : config.getEndSynTime())
-                .modifyEndTime(noNextTime ? config.getEndSynTime() : null)
+                .modifyBeginTime(isFirstSync ? config.getBeginSynTime() : config.getEndSynTime())
+                .modifyEndTime(isFirstSync ? config.getEndSynTime() : null)
                 .synIntervalSecond(config.getSynIntervalSecond())
                 .build();
     }
@@ -97,11 +78,34 @@ public abstract class AbstractSyncTemplate<T> {
         return TbPageUtil.totalPage(req);
     }
     
-    protected void updateSyncConfig(TbSynConfigDTO config, TbPageReqDTO pageReq) {
-        config.setSynState(TbSynConfigDTO.SYN_ONE);
+    private void updateSyncConfigForSyncing(TbSynConfigDTO config, TbPageReqDTO pageReq) {
         config.setBeginSynTime(pageReq.getModifyBeginTime());
         config.setEndSynTime(pageReq.getModifyEndTime());
+        config.setSynState(TbSynConfigDTO.SYN_THREE);
         synConfigService.saveTbSynConfigDTO(config);
+    }
+    
+    private void pushDataToQueue(TbTotalPageDTO<T> response, String cid) {
+        if (response.getDatas() != null && !response.getDatas().isEmpty()) {
+            synQueueService.leftPush(SynQueueService.REDIS_QUEUE_PREFIX, cid, response.getDatas());
+        }
+    }
+    
+    private void processDataWithBackup(T data, String cid, Consumer<T> dataConsumer) {
+        String backupPrefix = SynQueueService.REDIS_BAK_QUEUE_PREFIX + getBackupPrefix(data) + ":";
+        String backupKey = generateBackupKey(data);
+        
+        synQueueService.bakData(backupPrefix, cid, backupKey, data);
+        
+        if (dataConsumer != null) {
+            dataConsumer.accept(data);
+        }
+        
+        synQueueService.removeBakData(backupPrefix, cid, backupKey);
+    }
+    
+    private boolean isInitialState(Integer synState) {
+        return TbSynConfigDTO.SYN_TWO.equals(synState) || TbSynConfigDTO.SYN_THREE.equals(synState);
     }
     
     protected abstract DataProcessor<T> getDataProcessor();
