@@ -15,11 +15,6 @@ public class SynQueueService<T> {
     @Resource
     private RedisTemplate<String, T> redisTemplate;
     
-    public void leftPush(String prefix, String cid, T data) {
-        String queueKey = prefix + cid;
-        redisTemplate.opsForList().leftPush(queueKey, data);
-    }
-    
     public void leftPush(String prefix, String cid, List<T> dataList) {
         String queueKey = prefix + cid;
         redisTemplate.opsForList().leftPushAll(queueKey, dataList);

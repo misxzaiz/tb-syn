@@ -10,8 +10,6 @@ import org.example.syn.service.SynQueueService;
 import org.example.tb.util.TbPageUtil;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class AbstractSyncTemplate<T> {
