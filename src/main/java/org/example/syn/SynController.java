@@ -23,7 +23,7 @@ import java.util.*;
 @RequestMapping("/syn")
 public class SynController {
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, PurchaseInDTO> redisTemplate;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -33,26 +33,6 @@ public class SynController {
 
     private static RandleData randleData = new RandleData();
 
-    private static Integer ct = 1;
-    @RequestMapping("/pt")
-    public Object pt() {
-        List<Integer> list = new ArrayList<>();
-        list.add(ct++);
-        list.add(ct++);
-        Collections.reverse(list);
-
-        // 将数据推送到Redis队列
-        redisTemplate.opsForList().leftPushAll("ctp", list.toArray());
-
-        List<String> list1 = new ArrayList<>();
-        list1.add("ct++");
-        list1.add("ct+1+");
-        Collections.reverse(list1);
-        // 将数据推送到Redis队列
-        redisTemplate.opsForList().leftPushAll("ctps", list1.toArray());
-
-        return "你好";
-    }
 
     @RequestMapping("/test")
     public Object test(@RequestParam String name) {
@@ -102,12 +82,8 @@ public class SynController {
         // 3. push数据
         // 3. push数据到Redis队列
         if (resp.getDatas() != null && !resp.getDatas().isEmpty()) {
-            String queueKey = REDIS_QUEUE_PREFIX + cid;
             List<PurchaseInDTO> dataList = resp.getDatas();
-
-            // 将数据推送到Redis队列
-            Collections.reverse(dataList);
-            redisTemplate.opsForList().leftPushAll(queueKey, dataList);
+            leftPush(cid, dataList);
         }
 
         // 修改最后更新时间
@@ -116,6 +92,22 @@ public class SynController {
         saveTbSynConfigDTO(tbSynConfigDTO);
 
         return resp;
+    }
+
+    private void leftPush(String cid, List<PurchaseInDTO> dataList) {
+        String queueKey = REDIS_QUEUE_PREFIX + cid;
+
+        // 将数据推送到Redis队列
+        Collections.reverse(dataList);
+        redisTemplate.opsForList().leftPushAll(queueKey, dataList);
+    }
+
+    private PurchaseInDTO rightPop(String cid) {
+        String queueKey = REDIS_QUEUE_PREFIX + cid;
+
+        // 将数据推送到Redis队列
+        PurchaseInDTO o = redisTemplate.opsForList().rightPop(queueKey);
+        return o;
     }
 
     private void saveTbSynConfigDTO(TbSynConfigDTO tbSynConfigDTO) {
@@ -127,6 +119,17 @@ public class SynController {
         String json = stringRedisTemplate.opsForValue().get(REDIS_KEY_PREFIX + cid);
 
         return Optional.ofNullable(StrUtil.isBlank(json) ? null : JSONUtil.toBean(json, TbSynConfigDTO.class));
+    }
+
+
+    /**
+     * 推送数据
+     * @param cid 租户id
+     * @return
+     */
+    @RequestMapping("/popDate")
+    public Object popDate(@RequestParam String cid) {
+        return rightPop(cid);
     }
 
 
