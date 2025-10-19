@@ -24,17 +24,16 @@ public class DemoController {
         List<Integer> list = new ArrayList<>();
         list.add(ct++);
         list.add(ct++);
-        Collections.reverse(list);
 
         // 将数据推送到Redis队列
         redisTemplate.opsForList().leftPushAll("ctp", list.toArray());
-
-        List<String> list1 = new ArrayList<>();
-        list1.add("ct++");
-        list1.add("ct+1+");
-        Collections.reverse(list1);
-        // 将数据推送到Redis队列
-        redisTemplate.opsForList().leftPushAll("ctps", list1.toArray());
+//
+//        List<String> list1 = new ArrayList<>();
+//        list1.add("ct++");
+//        list1.add("ct+1+");
+//        Collections.reverse(list1);
+//        // 将数据推送到Redis队列
+//        redisTemplate.opsForList().leftPushAll("ctps", list1.toArray());
 
         return "你好";
     }

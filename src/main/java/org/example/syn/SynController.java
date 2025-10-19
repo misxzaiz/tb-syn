@@ -98,8 +98,16 @@ public class SynController {
         String queueKey = REDIS_QUEUE_PREFIX + cid;
 
         // 将数据推送到Redis队列
-        Collections.reverse(dataList);
         redisTemplate.opsForList().leftPushAll(queueKey, dataList);
+    }
+
+    private PurchaseInDTO right(String cid) {
+        String queueKey = REDIS_QUEUE_PREFIX + cid;
+
+//        redisTemplate.opsForList().
+        // 将数据推送到Redis队列
+        PurchaseInDTO o = redisTemplate.opsForList().rightPop(queueKey);
+        return o;
     }
 
     private PurchaseInDTO rightPop(String cid) {
@@ -129,7 +137,9 @@ public class SynController {
      */
     @RequestMapping("/popDate")
     public Object popDate(@RequestParam String cid) {
-        return rightPop(cid);
+        PurchaseInDTO purchaseInDTO = rightPop(cid);
+
+        return purchaseInDTO;
     }
 
 
