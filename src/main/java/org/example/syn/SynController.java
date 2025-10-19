@@ -101,6 +101,17 @@ public class SynController {
         redisTemplate.opsForList().leftPushAll(queueKey, dataList);
     }
 
+    private void saveTbSynConfigDTO(TbSynConfigDTO tbSynConfigDTO) {
+        stringRedisTemplate.opsForValue().set(REDIS_KEY_PREFIX + tbSynConfigDTO.getCid(), JSONUtil.toJsonStr(tbSynConfigDTO));
+    }
+
+    private Optional<TbSynConfigDTO> getTbSynConfigDTO(String cid) {
+        // TODO 并发问题？
+        String json = stringRedisTemplate.opsForValue().get(REDIS_KEY_PREFIX + cid);
+
+        return Optional.ofNullable(StrUtil.isBlank(json) ? null : JSONUtil.toBean(json, TbSynConfigDTO.class));
+    }
+
     private PurchaseInDTO right(String cid) {
         String queueKey = REDIS_QUEUE_PREFIX + cid;
 
@@ -116,17 +127,6 @@ public class SynController {
         // 将数据推送到Redis队列
         PurchaseInDTO o = redisTemplate.opsForList().rightPop(queueKey);
         return o;
-    }
-
-    private void saveTbSynConfigDTO(TbSynConfigDTO tbSynConfigDTO) {
-        stringRedisTemplate.opsForValue().set(REDIS_KEY_PREFIX + tbSynConfigDTO.getCid(), JSONUtil.toJsonStr(tbSynConfigDTO));
-    }
-
-    private Optional<TbSynConfigDTO> getTbSynConfigDTO(String cid) {
-        // TODO 并发问题？
-        String json = stringRedisTemplate.opsForValue().get(REDIS_KEY_PREFIX + cid);
-
-        return Optional.ofNullable(StrUtil.isBlank(json) ? null : JSONUtil.toBean(json, TbSynConfigDTO.class));
     }
 
 
