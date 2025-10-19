@@ -139,7 +139,7 @@ public class SynController {
         PurchaseInDTO purchaseInDTO = rightPop(REDIS_QUEUE_PREFIX, cid);
 
         if (purchaseInDTO == null) {
-            rightPop(REDIS_BAK_QUEUE_PREFIX, cid);
+            pushDate(cid);
             return "数据同步";
         }
 
