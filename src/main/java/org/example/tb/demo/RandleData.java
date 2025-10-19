@@ -35,6 +35,8 @@ public class RandleData {
         System.out.println(purchaseInDTOTbTotalPageDTO);
     }
 
+
+
     public TbPageDTO<PurchaseInDTO> page(TbPageReqDTO req) {
         TbPageDTO<PurchaseInDTO> result = new TbPageDTO<>();
         
