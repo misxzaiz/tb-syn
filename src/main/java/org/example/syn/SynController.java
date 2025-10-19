@@ -10,24 +10,49 @@ import org.example.tb.model.TbTotalPageDTO;
 import org.example.tb.model.TbTotalPageReqDTO;
 import org.example.tb.util.TbDateUtil;
 import org.example.tb.util.TbPageUtil;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/syn")
 public class SynController {
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
     public static String REDIS_KEY_PREFIX = "tb:syn:config:cid:";
+    public static String REDIS_QUEUE_PREFIX = "tb:syn:queue:cid:";
 
     private static RandleData randleData = new RandleData();
+
+    private static Integer ct = 1;
+    @RequestMapping("/pt")
+    public Object pt() {
+        List<Integer> list = new ArrayList<>();
+        list.add(ct++);
+        list.add(ct++);
+        Collections.reverse(list);
+
+        // 将数据推送到Redis队列
+        redisTemplate.opsForList().leftPushAll("ctp", list.toArray());
+
+        List<String> list1 = new ArrayList<>();
+        list1.add("ct++");
+        list1.add("ct+1+");
+        Collections.reverse(list1);
+        // 将数据推送到Redis队列
+        redisTemplate.opsForList().leftPushAll("ctps", list1.toArray());
+
+        return "你好";
+    }
 
     @RequestMapping("/test")
     public Object test(@RequestParam String name) {
@@ -72,17 +97,25 @@ public class SynController {
 
 
         // 2. 查询数据
-        TbTotalPageDTO<PurchaseInDTO> dates = TbPageUtil.totalPage(req);
+        TbTotalPageDTO<PurchaseInDTO> resp = TbPageUtil.totalPage(req);
 
         // 3. push数据
+        // 3. push数据到Redis队列
+        if (resp.getDatas() != null && !resp.getDatas().isEmpty()) {
+            String queueKey = REDIS_QUEUE_PREFIX + cid;
+            List<PurchaseInDTO> dataList = resp.getDatas();
 
+            // 将数据推送到Redis队列
+            Collections.reverse(dataList);
+            redisTemplate.opsForList().leftPushAll(queueKey, dataList);
+        }
 
         // 修改最后更新时间
         tbSynConfigDTO.setIsSyn(TbSynConfigDTO.SYN_ONE);
         tbSynConfigDTO.setLastSynTime(pageReq.getModifyEndTime());
         saveTbSynConfigDTO(tbSynConfigDTO);
 
-        return dates;
+        return resp;
     }
 
     private void saveTbSynConfigDTO(TbSynConfigDTO tbSynConfigDTO) {
