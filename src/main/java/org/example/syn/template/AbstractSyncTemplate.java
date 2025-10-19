@@ -11,6 +11,7 @@ import org.example.tb.util.TbPageUtil;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public abstract class AbstractSyncTemplate<T> {
@@ -44,6 +45,30 @@ public abstract class AbstractSyncTemplate<T> {
         synConfigService.saveTbSynConfigDTO(config);
 
         return response.toString();
+    }
+
+    public void syn(String cid, Consumer<T> dataConsumer) {
+        T data = synQueueService.rightPop(SynQueueService.REDIS_QUEUE_PREFIX, cid);
+
+        if (data == null) {
+            // TODO 异步发起然后退出
+            syncData(cid);
+            return;
+        }
+
+        processDataWithBackup(data, cid, dataConsumer);
+
+        int count = 0;
+        while (true) {
+            if (++count > 100) {
+                return;
+            }
+            data = synQueueService.rightPop(SynQueueService.REDIS_QUEUE_PREFIX, cid);
+            if (data == null) {
+                return;
+            }
+            processDataWithBackup(data, cid, dataConsumer);
+        }
     }
 
     public final Object popData(String cid, Consumer<T> dataConsumer) {
