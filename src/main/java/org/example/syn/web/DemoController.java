@@ -1,15 +1,11 @@
-package org.example.syn.demo;
+package org.example.syn.web;
 
-import org.example.tb.demo.PurchaseInDTO;
-import org.example.tb.demo.RandleData;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
