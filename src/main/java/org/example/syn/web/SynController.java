@@ -57,5 +57,19 @@ public class SynController {
         });
     }
 
+    /**
+     * 推送数据
+     * @param cid 租户id
+     * @return
+     */
+    @RequestMapping("/syn")
+    public Object syn(@RequestParam String cid) {
+        synDataProcessor.syn(cid, data -> {
+            // 持久化
+            System.out.println(data);
+        });
+        return "OK";
+    }
+
 
 }

@@ -31,4 +31,8 @@ public class SynDataProcessor {
     public Object popDate(String cid, Consumer<PurchaseInDTO> consumer) {
         return purchaseSyncTemplate.popData(cid, consumer);
     }
+
+    public void syn(String cid, Consumer<PurchaseInDTO> consumer) {
+        purchaseSyncTemplate.syn(cid, consumer);
+    }
 }
