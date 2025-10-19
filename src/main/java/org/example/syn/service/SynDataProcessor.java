@@ -3,6 +3,7 @@ package org.example.syn.service;
 import org.example.tb.demo.PurchaseInDTO;
 import org.example.tb.model.TbPageReqDTO;
 import org.example.tb.model.TbTotalPageDTO;
+import org.example.tb.util.TbPageUtil;
 import org.example.syn.processor.PurchaseDataProcessor;
 import org.example.syn.template.PurchaseSyncTemplate;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ public class SynDataProcessor {
     private PurchaseDataProcessor purchaseDataProcessor;
     
     public TbTotalPageDTO<PurchaseInDTO> synTestData() {
-        return purchaseDataProcessor.process(TbPageReqDTO.builder().build());
+        return TbPageUtil.totalPage(TbPageReqDTO.builder().build(), purchaseDataProcessor::process);
     }
     
     public String pushDate(String cid) {

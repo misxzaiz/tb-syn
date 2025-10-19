@@ -7,6 +7,7 @@ import org.example.tb.model.TbTotalPageReqDTO;
 import org.example.syn.processor.DataProcessor;
 import org.example.syn.service.SynConfigService;
 import org.example.syn.service.SynQueueService;
+import org.example.tb.util.TbPageUtil;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
@@ -82,7 +83,7 @@ public abstract class AbstractSyncTemplate<T> {
                 .pageReqFunc(processor::process)
                 .build();
         
-        return processor.process(pageReq);
+        return TbPageUtil.totalPage(req);
     }
     
     protected void updateSyncConfig(TbSynConfigDTO config, TbPageReqDTO pageReq) {
