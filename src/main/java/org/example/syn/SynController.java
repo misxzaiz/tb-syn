@@ -1,8 +1,11 @@
 package org.example.syn;
 
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import org.example.tb.demo.PurchaseInDTO;
 import org.example.tb.demo.RandleData;
 import org.example.tb.model.TbPageReqDTO;
+import org.example.tb.model.TbSynConfigDTO;
 import org.example.tb.model.TbTotalPageDTO;
 import org.example.tb.model.TbTotalPageReqDTO;
 import org.example.tb.util.TbDateUtil;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/syn")
@@ -20,6 +24,8 @@ public class SynController {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    public static String REDIS_KEY_PREFIX = "tb:syn:config:cid:";
 
     private static RandleData randleData = new RandleData();
 
@@ -44,15 +50,22 @@ public class SynController {
      * @return
      */
     @RequestMapping("/pushDate")
-    public Object pushDate(@RequestParam Integer cid) {
+    public Object pushDate(@RequestParam String cid) {
         // 1. 查询配置（redis）
-        // 查询最后更新时间？
-        String lastSynTime = TbDateUtil.dateTimeBeforeDayStr(7);
+        TbSynConfigDTO tbSynConfigDTO = getTbSynConfigDTO(cid).orElse(TbSynConfigDTO.init(cid));
+
+        if (TbSynConfigDTO.SYN_TWO.equals(tbSynConfigDTO.getIsSyn())) {
+            tbSynConfigDTO.setIsSyn(TbSynConfigDTO.SYN_ONE);
+            saveTbSynConfigDTO(tbSynConfigDTO);
+            return "初始化同步配置信息...";
+        }
+
+        TbPageReqDTO pageReq = TbPageReqDTO.builder()
+                .modifyBeginTime(tbSynConfigDTO.getLastSynTime())
+                .synIntervalSecond(tbSynConfigDTO.getSynIntervalSecond())
+                .build();
         TbTotalPageReqDTO<PurchaseInDTO> req = TbTotalPageReqDTO.<PurchaseInDTO>builder()
-                .pageReq(TbPageReqDTO.builder()
-                        .modifyBeginTime(lastSynTime)
-                        .modifyEndTime(TbDateUtil.dateTimeNowStr())
-                        .build())
+                .pageReq(pageReq)
                 .pageReqFunc(randleData::page)
                 .build();
 
@@ -63,7 +76,24 @@ public class SynController {
 
         // 3. push数据
 
+
+        // 修改最后更新时间
+        tbSynConfigDTO.setIsSyn(TbSynConfigDTO.SYN_ONE);
+        tbSynConfigDTO.setLastSynTime(pageReq.getModifyEndTime());
+        saveTbSynConfigDTO(tbSynConfigDTO);
+
         return dates;
+    }
+
+    private void saveTbSynConfigDTO(TbSynConfigDTO tbSynConfigDTO) {
+        stringRedisTemplate.opsForValue().set(REDIS_KEY_PREFIX + tbSynConfigDTO.getCid(), JSONUtil.toJsonStr(tbSynConfigDTO));
+    }
+
+    private Optional<TbSynConfigDTO> getTbSynConfigDTO(String cid) {
+        // TODO 并发问题？
+        String json = stringRedisTemplate.opsForValue().get(REDIS_KEY_PREFIX + cid);
+
+        return Optional.ofNullable(StrUtil.isBlank(json) ? null : JSONUtil.toBean(json, TbSynConfigDTO.class));
     }
 
 
