@@ -12,7 +12,14 @@ import org.example.tb.util.TbDateUtil;
 @Builder
 public class TbSynConfigDTO {
     private String cid;
-    private String lastSynTime;
+    /**
+     * 同步开始时间
+     */
+    private String beginSynTime;
+    /**
+     * 同步结束时间
+     */
+    private String endSynTime;
     private Integer synIntervalSecond;
     /**
      * 是否同步 0-不同步 1-同步 2-初始化
@@ -20,10 +27,13 @@ public class TbSynConfigDTO {
     private Integer isSyn;
 
     public static TbSynConfigDTO init(String cid) {
+        String dateTimeNowStr = TbDateUtil.dateTimeNowStr();
+        int synIntervalSecond = 60 * 10;
         return TbSynConfigDTO.builder()
-                .lastSynTime(TbDateUtil.dateTimeNowStr())
+                .beginSynTime(dateTimeNowStr)
+                .endSynTime(TbDateUtil.dateTimeAfterSecond(dateTimeNowStr, synIntervalSecond))
                 .cid(cid)
-                .synIntervalSecond(60 * 10)
+                .synIntervalSecond(synIntervalSecond)
                 .isSyn(SYN_TWO)
                 .build();
     }

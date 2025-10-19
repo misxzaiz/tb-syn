@@ -71,7 +71,7 @@ public abstract class AbstractSyncTemplate<T> {
     
     protected TbPageReqDTO buildPageRequest(TbSynConfigDTO config) {
         return TbPageReqDTO.builder()
-                .modifyBeginTime(config.getLastSynTime())
+                .modifyBeginTime(config.getEndSynTime())
                 .synIntervalSecond(config.getSynIntervalSecond())
                 .build();
     }
@@ -88,7 +88,8 @@ public abstract class AbstractSyncTemplate<T> {
     
     protected void updateSyncConfig(TbSynConfigDTO config, TbPageReqDTO pageReq) {
         config.setIsSyn(TbSynConfigDTO.SYN_ONE);
-        config.setLastSynTime(pageReq.getModifyEndTime());
+        config.setBeginSynTime(pageReq.getModifyBeginTime());
+        config.setEndSynTime(pageReq.getModifyEndTime());
         synConfigService.saveTbSynConfigDTO(config);
     }
     
