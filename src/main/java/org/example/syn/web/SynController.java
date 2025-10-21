@@ -1,6 +1,6 @@
 package org.example.syn.web;
 
-import org.example.syn.service.SynDataProcessor;
+import org.example.syn.template.PurchaseSyncTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 public class SynController {
 
     @Resource
-    private SynDataProcessor synDataProcessor;
+    private PurchaseSyncTemplate purchaseSyncTemplate;
 
 
     /**
@@ -22,7 +22,7 @@ public class SynController {
      */
     @RequestMapping("/syn")
     public Object syn(@RequestParam String cid) {
-        synDataProcessor.syn(cid, data -> {
+        purchaseSyncTemplate.syn(cid, data -> {
             // 持久化
             System.out.println(data);
         });
