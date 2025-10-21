@@ -49,7 +49,6 @@ public abstract class AbstractSyncTemplate<T> {
         T data = synQueueService.rightPop(SynQueueService.REDIS_QUEUE_PREFIX, cid);
 
         if (data == null) {
-            // TODO 异步发起然后退出
             syncData(cid);
             return;
         }
