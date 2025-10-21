@@ -1,5 +1,6 @@
 package org.example.syn.template;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.tb.model.TbPageReqDTO;
 import org.example.tb.model.TbSynConfigDTO;
 import org.example.tb.model.TbTotalPageDTO;
@@ -12,6 +13,7 @@ import org.example.tb.util.TbPageUtil;
 import javax.annotation.Resource;
 import java.util.function.Consumer;
 
+@Slf4j
 public abstract class AbstractSyncTemplate<T> {
     
     @Resource
@@ -20,20 +22,20 @@ public abstract class AbstractSyncTemplate<T> {
     @Resource
     protected SynQueueService<T> synQueueService;
     
-    public final String syncData(String cid) {
+    public final void syncData(String cid) {
         TbSynConfigDTO config = synConfigService.getTbSynConfigDTO(cid).orElse(TbSynConfigDTO.init(cid));
         
         if (TbSynConfigDTO.SYN_TWO.equals(config.getSynState())) {
             config.setSynState(TbSynConfigDTO.SYN_ONE);
             synConfigService.saveTbSynConfigDTO(config);
-            return "初始化同步配置信息...";
+            log.info("初始化同步配置信息...");
         }
         
         TbPageReqDTO pageReq = buildPageRequest(config);
         updateSyncConfigForSyncing(config, pageReq);
 
         if (TbPageReqDTO.SYN_TWO.equals(pageReq.getIsSyn())) {
-            return "同步时间未到达，等待中...";
+            log.info("同步时间未到达，等待中...");
         }
         
         TbTotalPageDTO<T> response = fetchData(pageReq);
@@ -41,8 +43,6 @@ public abstract class AbstractSyncTemplate<T> {
         
         config.setSynState(TbSynConfigDTO.SYN_ONE);
         synConfigService.saveTbSynConfigDTO(config);
-
-        return response.toString();
     }
 
     public void syn(String cid, Consumer<T> dataConsumer) {
@@ -67,19 +67,6 @@ public abstract class AbstractSyncTemplate<T> {
             }
             processDataWithBackup(data, cid, dataConsumer);
         }
-    }
-
-    public final Object popData(String cid, Consumer<T> dataConsumer) {
-        T data = synQueueService.rightPop(SynQueueService.REDIS_QUEUE_PREFIX, cid);
-        
-        if (data == null) {
-            syncData(cid);
-            return "数据同步";
-        }
-        
-        processDataWithBackup(data, cid, dataConsumer);
-        
-        return data;
     }
     
     protected TbPageReqDTO buildPageRequest(TbSynConfigDTO config) {
