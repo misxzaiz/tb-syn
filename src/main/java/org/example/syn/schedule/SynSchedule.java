@@ -15,7 +15,7 @@ public class SynSchedule {
     private PurchaseSyncTemplate purchaseSyncTemplate;
 
     @Scheduled(fixedRate = 5000) // 5000 毫秒 = 5 秒
-    public void scheduleTaskWithFixedRate() {
+    public void syn() {
         String cid = "1";
         purchaseSyncTemplate.syn(cid, data -> {
             // 持久化
