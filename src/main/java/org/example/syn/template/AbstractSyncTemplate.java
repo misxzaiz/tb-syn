@@ -49,8 +49,7 @@ public abstract class AbstractSyncTemplate<T> {
         if (bakData != null) {
             log.debug("有备份数据，开始处理...");
             processDataWithBackup(bakData, cid, dataConsumer);
-            log.debug("处理完成...");
-            return;
+            log.debug("备份数据处理完成...");
         }
 
         T data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
@@ -59,6 +58,12 @@ public abstract class AbstractSyncTemplate<T> {
             log.debug("没有数据，开始同步...");
             syncData(cid);
             log.debug("同步完成...");
+        }
+
+
+        data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
+        if (data == null) {
+            log.debug("没有数据...");
             return;
         }
 
