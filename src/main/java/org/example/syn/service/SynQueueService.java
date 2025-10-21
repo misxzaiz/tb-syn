@@ -60,13 +60,13 @@ public class SynQueueService<T> {
             // 执行Lua脚本
             Object result = redisTemplate.execute(script, keys);
             T data = result != null ? (T) result : null;
-            
+
             if (data != null) {
                 log.debug("popAndBak成功: cid={}, key={}, 数据大小={}", cid, key, data.toString().length());
             } else {
                 log.debug("popAndBak队列为空: cid={}, key={}", cid, key);
             }
-            
+
             return data;
             
         } catch (Exception e) {
@@ -75,13 +75,13 @@ public class SynQueueService<T> {
         }
     }
 
-    public T getBakData(String prefix, String cid) {
+    public T get(String prefix, String cid) {
         String queueKey = prefix + cid;
         return redisTemplate.opsForValue().get(queueKey);
     }
-    
-    public void removeBakData(String prefix, String cid) {
+
+    public void remove(String prefix, String cid) {
         String queueKey = prefix + cid;
-        redisTemplate.opsForHash().delete(queueKey);
+        redisTemplate.delete(queueKey);
     }
 }

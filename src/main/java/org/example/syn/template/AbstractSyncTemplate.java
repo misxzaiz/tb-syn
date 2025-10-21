@@ -44,7 +44,7 @@ public abstract class AbstractSyncTemplate<T> {
 
     public void syn(String cid, Consumer<T> dataConsumer) {
         // 先检查有没有备份的数据
-        T bakData = synQueueService.getBakData(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
+        T bakData = synQueueService.get(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
         if (bakData != null) {
             processDataWithBackup(bakData, cid, dataConsumer);
             return;
@@ -110,7 +110,7 @@ public abstract class AbstractSyncTemplate<T> {
             dataConsumer.accept(data);
         }
 
-        synQueueService.removeBakData(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
+        synQueueService.remove(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
     }
     
     private boolean isInitialState(Integer synState) {
