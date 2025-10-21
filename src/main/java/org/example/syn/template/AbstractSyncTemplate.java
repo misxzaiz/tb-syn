@@ -46,6 +46,13 @@ public abstract class AbstractSyncTemplate<T> {
     }
 
     public void syn(String cid, Consumer<T> dataConsumer) {
+        // 先检查有没有备份的数据
+        T bakData = synQueueService.getBakData(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
+        if (bakData != null) {
+            processDataWithBackup(bakData, cid, dataConsumer);
+            return;
+        }
+
         T data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
 
         if (data == null) {
@@ -102,6 +109,7 @@ public abstract class AbstractSyncTemplate<T> {
     
     private void processDataWithBackup(T data, String cid, Consumer<T> dataConsumer) {
         if (dataConsumer != null) {
+            // 需要确定已消费
             dataConsumer.accept(data);
         }
 

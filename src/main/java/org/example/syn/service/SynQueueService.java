@@ -74,15 +74,10 @@ public class SynQueueService<T> {
             throw new RuntimeException("popAndBak操作失败", e);
         }
     }
-    
-    public T rightPop(String prefix, String cid) {
+
+    public T getBakData(String prefix, String cid) {
         String queueKey = prefix + cid;
-        return redisTemplate.opsForList().rightPop(queueKey);
-    }
-    
-    public void bakData(String prefix, String cid, String key, T data) {
-        String queueKey = prefix + cid;
-        redisTemplate.opsForHash().put(queueKey, key, data);
+        return redisTemplate.opsForValue().get(queueKey);
     }
     
     public void removeBakData(String prefix, String cid) {
