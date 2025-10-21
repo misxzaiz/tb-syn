@@ -28,7 +28,9 @@ public class TbSynConfigDTO {
 
     public static TbSynConfigDTO init(String cid) {
         String dateTimeNowStr = TbDateUtil.dateTimeNowStr();
-        int synIntervalSecond = 60 * 10;
+        // FIXME 10分钟
+//        int synIntervalSecond = 60 * 10;
+        int synIntervalSecond = 5;
         return TbSynConfigDTO.builder()
                 .beginSynTime(dateTimeNowStr)
                 .endSynTime(TbDateUtil.dateTimeAfterSecond(dateTimeNowStr, synIntervalSecond))
