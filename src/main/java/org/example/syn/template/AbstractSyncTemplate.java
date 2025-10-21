@@ -25,20 +25,17 @@ public abstract class AbstractSyncTemplate<T> {
     public final void syncData(String cid) {
         TbSynConfigDTO config = synConfigService.getTbSynConfigDTO(cid).orElse(TbSynConfigDTO.init(cid));
         
-        if (TbSynConfigDTO.SYN_TWO.equals(config.getSynState())) {
-            config.setSynState(TbSynConfigDTO.SYN_ONE);
-            synConfigService.saveTbSynConfigDTO(config);
-            log.info("初始化同步配置信息...");
-        }
-        
         TbPageReqDTO pageReq = buildPageRequest(config);
+
         updateSyncConfigForSyncing(config, pageReq);
 
         if (TbPageReqDTO.SYN_TWO.equals(pageReq.getIsSyn())) {
             log.info("同步时间未到达，等待中...");
+            return;
         }
         
         TbTotalPageDTO<T> response = fetchData(pageReq);
+
         pushDataToQueue(response, cid);
         
         config.setSynState(TbSynConfigDTO.SYN_ONE);
