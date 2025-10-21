@@ -46,7 +46,7 @@ public abstract class AbstractSyncTemplate<T> {
     }
 
     public void syn(String cid, Consumer<T> dataConsumer) {
-        T data = synQueueService.rightPop(SynQueueService.REDIS_QUEUE_PREFIX, cid);
+        T data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
 
         if (data == null) {
             syncData(cid);
@@ -60,7 +60,7 @@ public abstract class AbstractSyncTemplate<T> {
             if (++count > 100) {
                 return;
             }
-            data = synQueueService.rightPop(SynQueueService.REDIS_QUEUE_PREFIX, cid);
+            data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
             if (data == null) {
                 return;
             }
@@ -101,16 +101,11 @@ public abstract class AbstractSyncTemplate<T> {
     }
     
     private void processDataWithBackup(T data, String cid, Consumer<T> dataConsumer) {
-        String backupPrefix = SynQueueService.REDIS_BAK_QUEUE_PREFIX + getBackupPrefix(data) + ":";
-        String backupKey = generateBackupKey(data);
-        
-        synQueueService.bakData(backupPrefix, cid, backupKey, data);
-        
         if (dataConsumer != null) {
             dataConsumer.accept(data);
         }
-        
-        synQueueService.removeBakData(backupPrefix, cid, backupKey);
+
+        synQueueService.removeBakData(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
     }
     
     private boolean isInitialState(Integer synState) {
@@ -118,8 +113,4 @@ public abstract class AbstractSyncTemplate<T> {
     }
     
     protected abstract DataProcessor<T> getDataProcessor();
-    
-    protected abstract String getBackupPrefix(T data);
-    
-    protected abstract String generateBackupKey(T data);
 }

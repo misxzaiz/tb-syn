@@ -17,14 +17,5 @@ public class PurchaseSyncTemplate extends AbstractSyncTemplate<PurchaseInDTO> {
     protected DataProcessor<PurchaseInDTO> getDataProcessor() {
         return purchaseDataProcessor;
     }
-    
-    @Override
-    protected String getBackupPrefix(PurchaseInDTO data) {
-        return data.getIoId();
-    }
-    
-    @Override
-    protected String generateBackupKey(PurchaseInDTO data) {
-        return data.getIoId() + ":" + data.getUpdateTime();
-    }
+
 }

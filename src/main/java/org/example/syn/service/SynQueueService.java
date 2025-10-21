@@ -85,8 +85,8 @@ public class SynQueueService<T> {
         redisTemplate.opsForHash().put(queueKey, key, data);
     }
     
-    public void removeBakData(String prefix, String cid, String key) {
+    public void removeBakData(String prefix, String cid) {
         String queueKey = prefix + cid;
-        redisTemplate.opsForHash().delete(queueKey, key);
+        redisTemplate.opsForHash().delete(queueKey);
     }
 }
