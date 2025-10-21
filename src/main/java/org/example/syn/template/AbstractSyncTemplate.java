@@ -43,20 +43,26 @@ public abstract class AbstractSyncTemplate<T> {
     }
 
     public void syn(String cid, Consumer<T> dataConsumer) {
+        log.debug("开始同步数据...");
         // 先检查有没有备份的数据
         T bakData = synQueueService.get(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
         if (bakData != null) {
+            log.debug("有备份数据，开始处理...");
             processDataWithBackup(bakData, cid, dataConsumer);
+            log.debug("处理完成...");
             return;
         }
 
         T data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
 
         if (data == null) {
+            log.debug("没有数据，开始同步...");
             syncData(cid);
+            log.debug("同步完成...");
             return;
         }
 
+        log.debug("开始处理数据...");
         processDataWithBackup(data, cid, dataConsumer);
 
         int count = 0;
@@ -66,6 +72,7 @@ public abstract class AbstractSyncTemplate<T> {
             }
             data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
             if (data == null) {
+                log.debug("处理完成...");
                 return;
             }
             processDataWithBackup(data, cid, dataConsumer);

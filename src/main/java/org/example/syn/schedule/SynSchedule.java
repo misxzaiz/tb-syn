@@ -1,11 +1,13 @@
 package org.example.syn.schedule;
 
+import lombok.extern.slf4j.Slf4j;
 import org.example.syn.template.PurchaseSyncTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
+@Slf4j
 @Component
 public class SynSchedule {
 
@@ -17,7 +19,7 @@ public class SynSchedule {
         String cid = "1";
         purchaseSyncTemplate.syn(cid, data -> {
             // 持久化
-            System.out.println(data);
+            log.debug("已保存：{}", data.getIoId());
         });
     }
 
