@@ -1,8 +1,11 @@
 package org.example.syn.schedule;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.syn.core.SyncEngine;
+import org.example.syn.core.SyncEngineFactory;
+import org.example.syn.processor.PurchaseDataProcessor;
 import org.example.syn.service.PurchaseInService;
-import org.example.syn.template.PurchaseSyncTemplate;
+import org.example.tb.demo.PurchaseInDTO;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -16,10 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SynSchedule {
 
     @Resource
-    private PurchaseSyncTemplate purchaseSyncTemplate;
+    private PurchaseInService purchaseInService;
 
     @Resource
-    private PurchaseInService purchaseInService;
+    private PurchaseDataProcessor purchaseDataProcessor;
+
+    @Resource
+    private SyncEngineFactory syncEngineFactory;
 
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
@@ -34,7 +40,13 @@ public class SynSchedule {
             AtomicInteger syncCount = new AtomicInteger();
             try {
                 // 获取锁成功，执行同步逻辑
-                purchaseSyncTemplate.syn(cid, data -> {
+                // 直接使用SyncEngine，减少抽象层
+                SyncEngine<PurchaseInDTO> syncEngine = syncEngineFactory.getEngine(
+                    PurchaseInDTO.class,
+                    purchaseDataProcessor
+                );
+
+                syncEngine.syncAndConsume(cid, data -> {
                     // 持久化到MySQL
                     try {
                         purchaseInService.savePurchaseIn(data, cid);

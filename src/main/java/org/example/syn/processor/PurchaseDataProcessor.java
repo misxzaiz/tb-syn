@@ -1,5 +1,6 @@
 package org.example.syn.processor;
 
+import org.example.syn.core.DataProcessor;
 import org.example.tb.demo.PurchaseInDTO;
 import org.example.tb.demo.RandleData;
 import org.example.tb.model.BaseQueryRequest;
