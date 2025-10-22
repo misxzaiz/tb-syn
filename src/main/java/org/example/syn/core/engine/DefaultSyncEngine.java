@@ -1,13 +1,13 @@
-package org.example.syn.core.processor;
+package org.example.syn.core.engine;
 
 import lombok.extern.slf4j.Slf4j;
 // DataProcessor现在在同一个包中，不需要import
-import org.example.syn.core.engine.SyncEngine;
 import org.example.syn.core.api.SynConfigService;
 import org.example.syn.core.api.SynQueueService;
 import org.example.syn.core.model.PageReqDTO;
 import org.example.syn.core.model.SynConfigDTO;
 import org.example.syn.core.model.TotalPageDTO;
+import org.example.syn.core.processor.DataProcessor;
 
 import java.util.function.Consumer;
 

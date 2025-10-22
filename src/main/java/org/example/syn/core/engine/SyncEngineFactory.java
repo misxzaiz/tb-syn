@@ -4,7 +4,6 @@ package org.example.syn.core.engine;
 import org.example.syn.core.api.SynConfigService;
 import org.example.syn.core.api.SynQueueService;
 import org.example.syn.core.processor.DataProcessor;
-import org.example.syn.core.processor.DefaultSyncEngine;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
