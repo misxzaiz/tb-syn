@@ -1,7 +1,7 @@
 package org.example.syn.core;
 
-import org.example.tb.model.BaseQueryRequest;
 import org.example.tb.model.TbPageDTO;
+import org.example.tb.model.TbPageReqDTO;
 
 /**
  * 数据处理器接口
@@ -13,5 +13,5 @@ public interface DataProcessor<T> {
      * @param req 查询请求
      * @return 分页数据
      */
-    TbPageDTO<T> process(BaseQueryRequest req);
+    TbPageDTO<T> process(TbPageReqDTO req);
 }

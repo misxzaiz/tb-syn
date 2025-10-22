@@ -4,11 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 // DataProcessor现在在同一个包中，不需要import
 import org.example.syn.service.SynConfigService;
 import org.example.syn.service.SynQueueService;
-import org.example.tb.model.BaseQueryRequest;
 import org.example.tb.model.TbPageDTO;
+import org.example.tb.model.TbPageReqDTO;
 import org.example.tb.model.TbSynConfigDTO;
 
-import javax.annotation.Resource;
 import java.util.function.Consumer;
 
 /**
@@ -85,7 +84,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
         TbSynConfigDTO config = synConfigService.getTbSynConfigDTO(cid)
                 .orElse(TbSynConfigDTO.init(cid));
 
-        BaseQueryRequest queryRequest = queryRequestBuilder.build(config);
+        TbPageReqDTO queryRequest = queryRequestBuilder.build(config);
 
         if (!shouldSync(queryRequest)) {
             log.info("同步时间未到达，cid: {}", cid);
@@ -115,9 +114,9 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
                 .orElse("未找到配置");
     }
 
-    private boolean shouldSync(BaseQueryRequest queryRequest) {
+    private boolean shouldSync(TbPageReqDTO queryRequest) {
         // 这里可以添加更复杂的同步条件判断
-        return queryRequest.getParam("modifyBeginTime", String.class) != null;
+        return queryRequest.getModifyBeginTime() != null;
     }
 
     private void processWithBackup(T data, String cid, Consumer<T> dataConsumer) {

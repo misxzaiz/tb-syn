@@ -1,8 +1,8 @@
 package org.example.syn.processor;
 
-import org.example.tb.model.BaseQueryRequest;
 import org.example.tb.model.TbPageDTO;
+import org.example.tb.model.TbPageReqDTO;
 
 public interface DataProcessor<T> {
-    TbPageDTO<T> process(BaseQueryRequest req);
+    TbPageDTO<T> process(TbPageReqDTO req);
 }
