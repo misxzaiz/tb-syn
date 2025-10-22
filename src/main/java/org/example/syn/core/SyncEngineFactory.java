@@ -1,8 +1,8 @@
 package org.example.syn.core;
 
 // DataProcessor现在在同一个包中，不需要import
-import org.example.syn.service.SynConfigService;
-import org.example.syn.service.SynQueueService;
+import org.example.syn.core.api.SynConfigService;
+import org.example.syn.core.api.SynQueueService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

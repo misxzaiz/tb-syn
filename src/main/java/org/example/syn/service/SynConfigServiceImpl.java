@@ -1,5 +1,6 @@
 package org.example.syn.service;
 
+import org.example.syn.core.api.SynConfigService;
 import org.example.syn.core.model.SynConfigDTO;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,7 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 @Service
-public class SynConfigService {
+public class SynConfigServiceImpl implements SynConfigService {
     
     public static String REDIS_KEY_PREFIX = "tb:syn:config:cid:";
     

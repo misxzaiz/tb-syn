@@ -1,5 +1,6 @@
 package org.example.syn.service;
 
+import org.example.syn.core.api.SynQueueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class SynQueueService<T> {
+public class SynQueueServiceImpl<T> implements SynQueueService<T> {
     
     private static final Logger log = LoggerFactory.getLogger(SynQueueService.class);
     
