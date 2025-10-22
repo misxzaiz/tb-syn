@@ -1,8 +1,8 @@
 package org.example.syn.service;
 
-import org.example.syn.entity.PurchaseIn;
+import org.example.syn.model.entity.PurchaseIn;
 import org.example.syn.mapper.PurchaseInMapper;
-import org.example.tb.demo.PurchaseInDTO;
+import org.example.syn.model.dto.TbPurchaseInDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ public class PurchaseInService {
      * 保存采购入库数据
      */
     @Transactional
-    public void savePurchaseIn(PurchaseInDTO dto, String cid) {
+    public void savePurchaseIn(TbPurchaseInDTO dto, String cid) {
         // 检查是否已存在
         PurchaseIn existing = purchaseInMapper.selectByIoId(dto.getIoId(), cid);
 
@@ -48,7 +48,7 @@ public class PurchaseInService {
      * 批量保存采购入库数据
      */
     @Transactional
-    public void batchSavePurchaseIn(List<PurchaseInDTO> dtoList, String cid) {
+    public void batchSavePurchaseIn(List<TbPurchaseInDTO> dtoList, String cid) {
         if (dtoList == null || dtoList.isEmpty()) {
             return;
         }
@@ -56,7 +56,7 @@ public class PurchaseInService {
         List<PurchaseIn> insertList = new ArrayList<>();
         List<PurchaseIn> updateList = new ArrayList<>();
 
-        for (PurchaseInDTO dto : dtoList) {
+        for (TbPurchaseInDTO dto : dtoList) {
             PurchaseIn existing = purchaseInMapper.selectByIoId(dto.getIoId(), cid);
             PurchaseIn purchaseIn = new PurchaseIn();
             BeanUtils.copyProperties(dto, purchaseIn);

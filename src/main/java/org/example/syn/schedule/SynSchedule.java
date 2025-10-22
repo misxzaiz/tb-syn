@@ -5,7 +5,7 @@ import org.example.syn.core.SyncEngine;
 import org.example.syn.core.SyncEngineFactory;
 import org.example.syn.processor.PurchaseDataProcessor;
 import org.example.syn.service.PurchaseInService;
-import org.example.tb.demo.PurchaseInDTO;
+import org.example.syn.model.dto.TbPurchaseInDTO;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -41,8 +41,8 @@ public class SynSchedule {
             try {
                 // 获取锁成功，执行同步逻辑
                 // 直接使用SyncEngine，减少抽象层
-                SyncEngine<PurchaseInDTO> syncEngine = syncEngineFactory.getEngine(
-                    PurchaseInDTO.class,
+                SyncEngine<TbPurchaseInDTO> syncEngine = syncEngineFactory.getEngine(
+                    TbPurchaseInDTO.class,
                     purchaseDataProcessor
                 );
 

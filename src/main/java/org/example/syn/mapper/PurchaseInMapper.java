@@ -2,7 +2,7 @@ package org.example.syn.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.example.syn.entity.PurchaseIn;
+import org.example.syn.model.entity.PurchaseIn;
 
 import java.util.List;
 
