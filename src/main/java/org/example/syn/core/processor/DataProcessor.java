@@ -1,4 +1,4 @@
-package org.example.syn.core;
+package org.example.syn.core.processor;
 
 import org.example.syn.core.model.PageReqDTO;
 import org.example.syn.core.model.TotalPageDTO;

@@ -1,4 +1,4 @@
-package org.example.syn.core;
+package org.example.syn.core.engine;
 
 import java.util.function.Consumer;
 

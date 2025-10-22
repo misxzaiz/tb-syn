@@ -1,6 +1,6 @@
 package org.example.syn.processor;
 
-import org.example.syn.core.DataProcessor;
+import org.example.syn.core.processor.DataProcessor;
 import org.example.syn.model.dto.TbPurchaseInDTO;
 import org.example.syn.core.model.PageDTO;
 import org.example.syn.core.model.PageReqDTO;

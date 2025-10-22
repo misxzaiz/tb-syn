@@ -1,7 +1,8 @@
-package org.example.syn.core;
+package org.example.syn.core.processor;
 
 import lombok.extern.slf4j.Slf4j;
 // DataProcessor现在在同一个包中，不需要import
+import org.example.syn.core.engine.SyncEngine;
 import org.example.syn.core.api.SynConfigService;
 import org.example.syn.core.api.SynQueueService;
 import org.example.syn.core.model.PageReqDTO;

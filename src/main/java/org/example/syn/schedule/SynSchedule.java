@@ -1,8 +1,8 @@
 package org.example.syn.schedule;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.syn.core.SyncEngine;
-import org.example.syn.core.SyncEngineFactory;
+import org.example.syn.core.engine.SyncEngine;
+import org.example.syn.core.engine.SyncEngineFactory;
 import org.example.syn.processor.PurchaseDataProcessor;
 import org.example.syn.service.PurchaseInService;
 import org.example.syn.model.dto.TbPurchaseInDTO;

@@ -1,9 +1,10 @@
-package org.example.syn.core;
+package org.example.syn.core.engine;
 
 // DataProcessor现在在同一个包中，不需要import
 import org.example.syn.core.api.SynConfigService;
 import org.example.syn.core.api.SynQueueService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.syn.core.processor.DataProcessor;
+import org.example.syn.core.processor.DefaultSyncEngine;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
