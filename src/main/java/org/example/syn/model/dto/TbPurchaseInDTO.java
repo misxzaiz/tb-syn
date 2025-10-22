@@ -1,4 +1,4 @@
-package org.example.tb.demo;
+package org.example.syn.model.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-public class PurchaseInDTO implements Serializable {
+public class TbPurchaseInDTO implements Serializable {
     private String ioId;
     private String purchaseNo;
     private String supplierName;

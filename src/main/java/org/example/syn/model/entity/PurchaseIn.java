@@ -1,4 +1,4 @@
-package org.example.syn.entity;
+package org.example.syn.model.entity;
 
 import lombok.Data;
 

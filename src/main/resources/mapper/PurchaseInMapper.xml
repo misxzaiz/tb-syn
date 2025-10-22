@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.syn.mapper.PurchaseInMapper">
 
-    <resultMap id="BaseResultMap" type="org.example.syn.entity.PurchaseIn">
+    <resultMap id="BaseResultMap" type="org.example.syn.model.entity.PurchaseIn">
         <id column="id" property="id" jdbcType="BIGINT"/>
         <result column="io_id" property="ioId" jdbcType="VARCHAR"/>
         <result column="purchase_no" property="purchaseNo" jdbcType="VARCHAR"/>
@@ -27,7 +27,7 @@
         update_time, remark, cid
     </sql>
 
-    <insert id="insert" parameterType="org.example.syn.entity.PurchaseIn" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insert" parameterType="org.example.syn.model.entity.PurchaseIn" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO purchase_in (
             io_id, purchase_no, supplier_name, product_name, product_code, quantity,
             unit_price, total_amount, purchase_type, status, purchase_date,
@@ -59,7 +59,7 @@
         WHERE io_id = #{ioId} AND cid = #{cid}
     </select>
 
-    <update id="updateByIoId" parameterType="org.example.syn.entity.PurchaseIn">
+    <update id="updateByIoId" parameterType="org.example.syn.model.entity.PurchaseIn">
         UPDATE purchase_in
         SET purchase_no = #{purchaseNo},
             supplier_name = #{supplierName},
