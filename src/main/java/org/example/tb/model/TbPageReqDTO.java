@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.tb.util.TbDateUtil;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,6 +17,19 @@ public class TbPageReqDTO {
     private String modifyEndTime;
     private Integer pageIndex;
     private Integer pageSize;
+    // 租户ID
+    private String cid;
+
+    // 动态查询参数
+    private Map<String, Object> queryParams = new HashMap<>();
+
+    // 获取参数
+    @SuppressWarnings("unchecked")
+    public <T> T getParam(String key) {
+        Object value = queryParams.get(key);
+        return value != null ? (T) value : null;
+    }
+
     /**
      * 1-同步 2-不同步（如开始时间大于当前时间）
      */
@@ -32,6 +48,8 @@ public class TbPageReqDTO {
         private Integer pageIndex;
         private Integer pageSize;
         private Integer synIntervalSecond;
+        private String cid;
+        private Map<String, Object> queryParams = new HashMap<>();
         public Builder modifyBeginTime(String modifyBeginTime) {
             this.modifyBeginTime = modifyBeginTime;
             return this;
@@ -50,6 +68,14 @@ public class TbPageReqDTO {
         }
         public Builder pageSize(Integer pageSize) {
             this.pageSize = pageSize;
+            return this;
+        }
+        public Builder cid(String cid) {
+            this.cid = cid;
+            return this;
+        }
+        public Builder param(String key, Object value) {
+            queryParams.put(key, value);
             return this;
         }
         public TbPageReqDTO build() {
@@ -71,8 +97,22 @@ public class TbPageReqDTO {
             if (pageSize == null) {
                 pageSize = 50;
             }
-            return new TbPageReqDTO(modifyBeginTime, modifyEndTime, pageIndex, pageSize, TbDateUtil.isAfter(modifyBeginTime, dateTimeNowStr) ? SYN_TWO : SYN_ONE);
+            TbPageReqDTO tbPageReqDTO = new TbPageReqDTO();
+            tbPageReqDTO.modifyBeginTime = modifyBeginTime;
+            tbPageReqDTO.modifyEndTime = modifyEndTime;
+            tbPageReqDTO.pageIndex = pageIndex;
+            tbPageReqDTO.pageSize = pageSize;
+            tbPageReqDTO.cid = cid;
+            tbPageReqDTO.queryParams = queryParams;
+            tbPageReqDTO.isSyn = TbDateUtil.isAfter(modifyBeginTime, dateTimeNowStr) ? SYN_TWO : SYN_ONE;
+            return tbPageReqDTO;
         }
 
+    }
+
+
+    // 计算偏移量
+    public int getOffset() {
+        return (pageIndex - 1) * pageSize;
     }
 }
