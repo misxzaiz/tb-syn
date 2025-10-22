@@ -38,6 +38,11 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
     @Override
     public void syncAndConsume(String cid, Consumer<T> dataConsumer) {
         log.debug("开始同步数据，cid: {}", cid);
+        SynConfigDTO config = synConfigService.getSynConfigDTO(cid)
+                .orElse(SynConfigDTO.init(cid));
+        if (SynConfigDTO.SYN_THREE.equals(config.getSynState())) {
+            synQueueService.remove(SynQueueService.REDIS_QUEUE_PREFIX, cid);
+        }
 
         // 先处理备份数据
         T bakData = synQueueService.get(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
