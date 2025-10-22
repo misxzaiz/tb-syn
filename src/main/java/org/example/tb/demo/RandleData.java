@@ -102,25 +102,43 @@ public class RandleData {
 //            throw new RuntimeException("调用太频繁");
 //        }
         List<PurchaseInDTO> dataList = new ArrayList<>();
-        
+
         // 使用查询参数作为随机种子，确保相同参数生成相同数据
-        String seedKey = (req.getModifyBeginTime() != null ? req.getModifyBeginTime() : "") + 
-                        (req.getModifyEndTime() != null ? req.getModifyEndTime() : "") + 
+        String seedKey = (req.getModifyBeginTime() != null ? req.getModifyBeginTime() : "") +
+                        (req.getModifyEndTime() != null ? req.getModifyEndTime() : "") +
                         (req.getPageIndex() != null ? req.getPageIndex() : 1);
         Random random = new Random(seedKey.hashCode());
-        
+
         String[] suppliers = {"供应商A", "供应商B", "供应商C", "供应商D", "供应商E"};
         String[] products = {"产品X", "产品Y", "产品Z", "产品M", "产品N"};
         String[] statuses = {"待审核", "已审核", "已驳回", "已完成"};
         String[] types = {"普通采购", "紧急采购", "计划采购"};
-        
+
+        // 用于记录已生成的随机数，避免单次请求内重复
+        java.util.Set<Integer> usedRandomNumbers = new java.util.HashSet<>();
+
         for (int i = startIndex; i < endIndex; i++) {
             PurchaseInDTO dto = new PurchaseInDTO();
-            dto.setIoId("IO" + String.format("%06d", i + 1));
-            dto.setPurchaseNo("P" + Math.abs(seedKey.hashCode()) + String.format("%03d", i));
+
+            // 生成1-100000的随机后缀，确保不重复
+            int randomSuffix;
+            int attempts = 0;
+            do {
+                randomSuffix = random.nextInt(100000) + 1;
+                attempts++;
+                // 如果尝试次数过多，说明可用数字快用完了，使用线性递增
+                if (attempts > 1000) {
+                    randomSuffix = (i + 1) % 100000 + 1;
+                    break;
+                }
+            } while (usedRandomNumbers.contains(randomSuffix));
+            usedRandomNumbers.add(randomSuffix);
+
+            dto.setIoId("IO" + String.format("%06d", randomSuffix));
+            dto.setPurchaseNo("P" + Math.abs(seedKey.hashCode()) + String.format("%05d", randomSuffix));
             dto.setSupplierName(suppliers[random.nextInt(suppliers.length)]);
             dto.setProductName(products[random.nextInt(products.length)]);
-            dto.setProductCode("PC" + String.format("%04d", random.nextInt(9999)));
+            dto.setProductCode("PC" + String.format("%05d", random.nextInt(100000)));
             dto.setQuantity(random.nextInt(100) + 1);
             dto.setUnitPrice(BigDecimal.valueOf(random.nextDouble() * 1000 + 10));
             dto.setTotalAmount(dto.getUnitPrice().multiply(BigDecimal.valueOf(dto.getQuantity())));
@@ -129,11 +147,11 @@ public class RandleData {
             dto.setPurchaseDate(LocalDateTime.now().minusDays(random.nextInt(30)));
             dto.setCreateTime(LocalDateTime.now().minusDays(random.nextInt(60)));
             dto.setUpdateTime(LocalDateTime.now().minusHours(random.nextInt(24)));
-            dto.setRemark("备注信息" + (i + 1));
-            
+            dto.setRemark("备注信息" + randomSuffix);
+
             dataList.add(dto);
         }
-        
+
         return dataList;
     }
 }
