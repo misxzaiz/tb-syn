@@ -2,10 +2,10 @@ package org.example.syn.processor;
 
 import org.example.syn.core.DataProcessor;
 import org.example.syn.model.dto.TbPurchaseInDTO;
-import org.example.tb.model.TbPageDTO;
-import org.example.tb.model.TbPageReqDTO;
-import org.example.tb.model.TbTotalPageDTO;
-import org.example.tb.util.TbPageUtil;
+import org.example.syn.core.model.PageDTO;
+import org.example.syn.core.model.PageReqDTO;
+import org.example.syn.core.model.TotalPageDTO;
+import org.example.syn.core.util.PageUtil;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -23,12 +23,12 @@ public class PurchaseDataProcessor implements DataProcessor<TbPurchaseInDTO> {
     private int maxDataCount = DEFAULT_MAX_COUNT;
 
     @Override
-    public TbTotalPageDTO<TbPurchaseInDTO> process(TbPageReqDTO req) {
-        return TbPageUtil.totalPage(req, this::page);
+    public TotalPageDTO<TbPurchaseInDTO> process(PageReqDTO req) {
+        return PageUtil.totalPage(req, this::page);
     }
 
-    public TbPageDTO<TbPurchaseInDTO> page(TbPageReqDTO req) {
-        TbPageDTO<TbPurchaseInDTO> result = new TbPageDTO<>();
+    public PageDTO<TbPurchaseInDTO> page(PageReqDTO req) {
+        PageDTO<TbPurchaseInDTO> result = new PageDTO<>();
 
         // 根据时间参数计算总数据量，确保相同参数返回相同数据量
         int totalCount = calculateTotalCount(req);
@@ -61,7 +61,7 @@ public class PurchaseDataProcessor implements DataProcessor<TbPurchaseInDTO> {
      * 根据查询参数计算总数据量
      * 使用ModifyBeginTime和ModifyEndTime的hash值确保相同参数返回相同数据量
      */
-    private int calculateTotalCount(TbPageReqDTO req) {
+    private int calculateTotalCount(PageReqDTO req) {
         String key = (req.getModifyBeginTime() != null ? req.getModifyBeginTime() : "") +
                 (req.getModifyEndTime() != null ? req.getModifyEndTime() : "");
 
@@ -87,7 +87,7 @@ public class PurchaseDataProcessor implements DataProcessor<TbPurchaseInDTO> {
         return maxDataCount;
     }
 
-    private List<TbPurchaseInDTO> generateMockData(int startIndex, int endIndex, TbPageReqDTO req) {
+    private List<TbPurchaseInDTO> generateMockData(int startIndex, int endIndex, PageReqDTO req) {
 //        if (!limiter.allowRequest()) {
 //            throw new RuntimeException("调用太频繁");
 //        }

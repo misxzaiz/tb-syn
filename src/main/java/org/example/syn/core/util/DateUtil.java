@@ -1,10 +1,10 @@
-package org.example.tb.util;
+package org.example.syn.core.util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-public class TbDateUtil {
+public class DateUtil {
     public static String dateTimeNowStr() {
         // 获取当前时间
         LocalDateTime now = LocalDateTime.now();
@@ -31,9 +31,9 @@ public class TbDateUtil {
     }
 
     public static String dateTimeAfterSecond(String time, int second) {
-        LocalDateTime lastSynTime = TbDateUtil.dateTimeParse(time);
+        LocalDateTime lastSynTime = DateUtil.dateTimeParse(time);
         LocalDateTime newSynTime = lastSynTime.plus(second, ChronoUnit.SECONDS);
-        return TbDateUtil.dateTimeFormat(newSynTime);
+        return DateUtil.dateTimeFormat(newSynTime);
     }
 
     public static LocalDateTime dateTimeParse(String dateTimeStr) {
@@ -52,13 +52,13 @@ public class TbDateUtil {
     }
 
     public static boolean isAfter(String time1, String time2) {
-        LocalDateTime t1 = TbDateUtil.dateTimeParse(time1);
-        LocalDateTime t2 = TbDateUtil.dateTimeParse(time2);
+        LocalDateTime t1 = DateUtil.dateTimeParse(time1);
+        LocalDateTime t2 = DateUtil.dateTimeParse(time2);
         return t1.isAfter(t2);
     }
 
     public static boolean isAfterNow(String time) {
-        LocalDateTime t1 = TbDateUtil.dateTimeParse(time);
+        LocalDateTime t1 = DateUtil.dateTimeParse(time);
         LocalDateTime now = LocalDateTime.now();
         return t1.isAfter(now);
     }

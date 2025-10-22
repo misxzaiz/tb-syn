@@ -1,7 +1,7 @@
 package org.example.syn.core;
 
-import org.example.tb.model.TbPageReqDTO;
-import org.example.tb.model.TbTotalPageDTO;
+import org.example.syn.core.model.PageReqDTO;
+import org.example.syn.core.model.TotalPageDTO;
 
 /**
  * 数据处理器接口
@@ -13,5 +13,5 @@ public interface DataProcessor<T> {
      * @param req 查询请求
      * @return 分页数据
      */
-    TbTotalPageDTO<T> process(TbPageReqDTO req);
+    TotalPageDTO<T> process(PageReqDTO req);
 }

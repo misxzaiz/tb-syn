@@ -1,10 +1,9 @@
-package org.example.tb.model;
+package org.example.syn.core.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.tb.util.TbDateUtil;
+import org.example.syn.core.util.DateUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +11,7 @@ import java.util.Map;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TbPageReqDTO {
+public class PageReqDTO {
     private String modifyBeginTime;
     private String modifyEndTime;
     private Integer pageIndex;
@@ -78,17 +77,17 @@ public class TbPageReqDTO {
             queryParams.put(key, value);
             return this;
         }
-        public TbPageReqDTO build() {
-            String dateTimeNowStr = TbDateUtil.dateTimeNowStr();
+        public PageReqDTO build() {
+            String dateTimeNowStr = DateUtil.dateTimeNowStr();
             if (modifyBeginTime == null) {
-                modifyBeginTime = TbDateUtil.dateTimeBeforeDayStr(1);
+                modifyBeginTime = DateUtil.dateTimeBeforeDayStr(1);
             }
             if (synIntervalSecond != null) {
-                modifyEndTime = TbDateUtil.dateTimeAfterSecond(modifyBeginTime, synIntervalSecond);
+                modifyEndTime = DateUtil.dateTimeAfterSecond(modifyBeginTime, synIntervalSecond);
             }
             if (modifyEndTime == null) {
                 modifyEndTime = dateTimeNowStr;
-            } else if (TbDateUtil.isAfter(modifyEndTime, dateTimeNowStr)) {
+            } else if (DateUtil.isAfter(modifyEndTime, dateTimeNowStr)) {
                 modifyEndTime = dateTimeNowStr;
             }
             if (pageIndex == null) {
@@ -97,14 +96,14 @@ public class TbPageReqDTO {
             if (pageSize == null) {
                 pageSize = 50;
             }
-            TbPageReqDTO tbPageReqDTO = new TbPageReqDTO();
+            PageReqDTO tbPageReqDTO = new PageReqDTO();
             tbPageReqDTO.modifyBeginTime = modifyBeginTime;
             tbPageReqDTO.modifyEndTime = modifyEndTime;
             tbPageReqDTO.pageIndex = pageIndex;
             tbPageReqDTO.pageSize = pageSize;
             tbPageReqDTO.cid = cid;
             tbPageReqDTO.queryParams = queryParams;
-            tbPageReqDTO.isSyn = TbDateUtil.isAfter(modifyBeginTime, dateTimeNowStr) ? SYN_TWO : SYN_ONE;
+            tbPageReqDTO.isSyn = DateUtil.isAfter(modifyBeginTime, dateTimeNowStr) ? SYN_TWO : SYN_ONE;
             return tbPageReqDTO;
         }
 

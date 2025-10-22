@@ -1,11 +1,11 @@
-package org.example.tb.model;
+package org.example.syn.core.model;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class TbTotalPageDTO<T> {
+public class TotalPageDTO<T> {
 
     private Integer dataCount;
 

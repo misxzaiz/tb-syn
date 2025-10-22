@@ -1,7 +1,7 @@
 package org.example.syn.core;
 
-import org.example.tb.model.TbPageReqDTO;
-import org.example.tb.model.TbSynConfigDTO;
+import org.example.syn.core.model.PageReqDTO;
+import org.example.syn.core.model.SynConfigDTO;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,12 +14,12 @@ public class QueryRequestBuilder {
     /**
      * 根据同步配置构建查询请求
      */
-    public TbPageReqDTO build(TbSynConfigDTO config) {
+    public PageReqDTO build(SynConfigDTO config) {
         boolean isFirstSync = isInitialState(config.getSynState());
         String beginTime = isFirstSync ? config.getBeginSynTime() : config.getEndSynTime();
         String endTime = isFirstSync ? config.getEndSynTime() : null;
 
-        return TbPageReqDTO.builder()
+        return PageReqDTO.builder()
                 .cid(config.getCid())
                 .modifyBeginTime(beginTime)
                 .modifyEndTime(endTime)
@@ -28,7 +28,7 @@ public class QueryRequestBuilder {
     }
 
     private boolean isInitialState(Integer synState) {
-        return TbSynConfigDTO.SYN_TWO.equals(synState) ||
-               TbSynConfigDTO.SYN_THREE.equals(synState);
+        return SynConfigDTO.SYN_TWO.equals(synState) ||
+               SynConfigDTO.SYN_THREE.equals(synState);
     }
 }

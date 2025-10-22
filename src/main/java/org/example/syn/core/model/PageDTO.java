@@ -1,11 +1,11 @@
-package org.example.tb.model;
+package org.example.syn.core.model;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class TbPageDTO<T> {
+public class PageDTO<T> {
     private List<T> datas;
     private Integer pageIndex;
     private Boolean hasNext;

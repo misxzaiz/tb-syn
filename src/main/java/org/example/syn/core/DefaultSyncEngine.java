@@ -4,10 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 // DataProcessor现在在同一个包中，不需要import
 import org.example.syn.service.SynConfigService;
 import org.example.syn.service.SynQueueService;
-import org.example.tb.model.TbPageDTO;
-import org.example.tb.model.TbPageReqDTO;
-import org.example.tb.model.TbSynConfigDTO;
-import org.example.tb.model.TbTotalPageDTO;
+import org.example.syn.core.model.PageReqDTO;
+import org.example.syn.core.model.SynConfigDTO;
+import org.example.syn.core.model.TotalPageDTO;
 
 import java.util.function.Consumer;
 
@@ -82,10 +81,10 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
 
     @Override
     public void syncOnly(String cid) {
-        TbSynConfigDTO config = synConfigService.getTbSynConfigDTO(cid)
-                .orElse(TbSynConfigDTO.init(cid));
+        SynConfigDTO config = synConfigService.getTbSynConfigDTO(cid)
+                .orElse(SynConfigDTO.init(cid));
 
-        TbPageReqDTO queryRequest = queryRequestBuilder.build(config);
+        PageReqDTO queryRequest = queryRequestBuilder.build(config);
 
         if (!shouldSync(queryRequest)) {
             log.info("同步时间未到达，cid: {}", cid);
@@ -93,7 +92,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
         }
 
         // 执行数据查询
-        TbTotalPageDTO<T> pageResult = dataProcessor.process(queryRequest);
+        TotalPageDTO<T> pageResult = dataProcessor.process(queryRequest);
 
         // 推送到队列
         if (pageResult.getDatas() != null && !pageResult.getDatas().isEmpty()) {
@@ -102,7 +101,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
         }
 
         // 更新同步状态
-        config.setSynState(TbSynConfigDTO.SYN_ONE);
+        config.setSynState(SynConfigDTO.SYN_ONE);
         synConfigService.saveTbSynConfigDTO(config);
     }
 
@@ -115,7 +114,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
                 .orElse("未找到配置");
     }
 
-    private boolean shouldSync(TbPageReqDTO queryRequest) {
+    private boolean shouldSync(PageReqDTO queryRequest) {
         // 这里可以添加更复杂的同步条件判断
         return queryRequest.getModifyBeginTime() != null;
     }

@@ -1,14 +1,14 @@
-package org.example.tb.util;
+package org.example.syn.core.util;
 
-import org.example.tb.model.TbPageDTO;
-import org.example.tb.model.TbPageReqDTO;
-import org.example.tb.model.TbTotalPageDTO;
+import org.example.syn.core.model.PageDTO;
+import org.example.syn.core.model.PageReqDTO;
+import org.example.syn.core.model.TotalPageDTO;
 
 import java.util.function.Function;
 
-public class TbPageUtil {
+public class PageUtil {
 
-    public static <T> TbTotalPageDTO<T> totalPage(TbPageReqDTO reqDTO, Function<TbPageReqDTO, TbPageDTO<T>> pageReqFunc) {
+    public static <T> TotalPageDTO<T> totalPage(PageReqDTO reqDTO, Function<PageReqDTO, PageDTO<T>> pageReqFunc) {
         // 保存原始页码和页大小
         Integer originalPageIndex = reqDTO.getPageIndex();
         Integer originalPageSize = reqDTO.getPageSize();
@@ -21,13 +21,13 @@ public class TbPageUtil {
             }
             
             // 查询第一页获取总页数
-            TbPageDTO<T> firstPage = pageReqFunc.apply(reqDTO);
+            PageDTO<T> firstPage = pageReqFunc.apply(reqDTO);
             if (firstPage == null || firstPage.getPageCount() == null || firstPage.getPageCount() <= 0) {
-                return new TbTotalPageDTO<>();
+                return new TotalPageDTO<>();
             }
             
             // 准备结果对象
-            TbTotalPageDTO<T> result = new TbTotalPageDTO<>();
+            TotalPageDTO<T> result = new TotalPageDTO<>();
             
             // 合并所有页面的数据
             java.util.List<T> allData = new java.util.ArrayList<>();
@@ -41,7 +41,7 @@ public class TbPageUtil {
             Integer totalPages = firstPage.getPageCount();
             for (int pageIndex = 2; pageIndex <= totalPages; pageIndex++) {
                 reqDTO.setPageIndex(pageIndex);
-                TbPageDTO<T> pageData = pageReqFunc.apply(reqDTO);
+                PageDTO<T> pageData = pageReqFunc.apply(reqDTO);
                 if (pageData != null && pageData.getDatas() != null) {
                     allData.addAll(pageData.getDatas());
                 }

@@ -1,16 +1,16 @@
-package org.example.tb.model;
+package org.example.syn.core.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.tb.util.TbDateUtil;
+import org.example.syn.core.util.DateUtil;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TbSynConfigDTO {
+public class SynConfigDTO {
     private String cid;
     /**
      * 同步开始时间
@@ -26,14 +26,14 @@ public class TbSynConfigDTO {
      */
     private Integer synState;
 
-    public static TbSynConfigDTO init(String cid) {
-        String dateTimeNowStr = TbDateUtil.dateTimeNowStr();
+    public static SynConfigDTO init(String cid) {
+        String dateTimeNowStr = DateUtil.dateTimeNowStr();
         // FIXME 10分钟
 //        int synIntervalSecond = 60 * 10;
         int synIntervalSecond = 5;
-        return TbSynConfigDTO.builder()
+        return SynConfigDTO.builder()
                 .beginSynTime(dateTimeNowStr)
-                .endSynTime(TbDateUtil.dateTimeAfterSecond(dateTimeNowStr, synIntervalSecond))
+                .endSynTime(DateUtil.dateTimeAfterSecond(dateTimeNowStr, synIntervalSecond))
                 .cid(cid)
                 .synIntervalSecond(synIntervalSecond)
                 .synState(SYN_TWO)
