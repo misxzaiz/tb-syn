@@ -7,6 +7,7 @@ import org.example.syn.service.SynQueueService;
 import org.example.tb.model.TbPageDTO;
 import org.example.tb.model.TbPageReqDTO;
 import org.example.tb.model.TbSynConfigDTO;
+import org.example.tb.model.TbTotalPageDTO;
 
 import java.util.function.Consumer;
 
@@ -92,7 +93,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
         }
 
         // 执行数据查询
-        TbPageDTO<T> pageResult = dataProcessor.process(queryRequest);
+        TbTotalPageDTO<T> pageResult = dataProcessor.process(queryRequest);
 
         // 推送到队列
         if (pageResult.getDatas() != null && !pageResult.getDatas().isEmpty()) {

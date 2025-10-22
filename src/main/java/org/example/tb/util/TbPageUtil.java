@@ -3,15 +3,10 @@ package org.example.tb.util;
 import org.example.tb.model.TbPageDTO;
 import org.example.tb.model.TbPageReqDTO;
 import org.example.tb.model.TbTotalPageDTO;
-import org.example.tb.model.TbTotalPageReqDTO;
 
 import java.util.function.Function;
 
 public class TbPageUtil {
-
-    public static <T> TbTotalPageDTO<T> totalPage(TbTotalPageReqDTO<T> totalPageReqDTO) {
-        return totalPage(totalPageReqDTO.getPageReq(), totalPageReqDTO.getPageReqFunc());
-    }
 
     public static <T> TbTotalPageDTO<T> totalPage(TbPageReqDTO reqDTO, Function<TbPageReqDTO, TbPageDTO<T>> pageReqFunc) {
         // 保存原始页码和页大小

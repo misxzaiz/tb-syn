@@ -4,6 +4,8 @@ import org.example.syn.core.DataProcessor;
 import org.example.syn.model.dto.TbPurchaseInDTO;
 import org.example.tb.model.TbPageDTO;
 import org.example.tb.model.TbPageReqDTO;
+import org.example.tb.model.TbTotalPageDTO;
+import org.example.tb.util.TbPageUtil;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -21,15 +23,8 @@ public class PurchaseDataProcessor implements DataProcessor<TbPurchaseInDTO> {
     private int maxDataCount = DEFAULT_MAX_COUNT;
 
     @Override
-    public TbPageDTO<TbPurchaseInDTO> process(TbPageReqDTO req) {
-        TbPageReqDTO pageReq = TbPageReqDTO.builder()
-                .modifyBeginTime(req.getModifyBeginTime())
-                .modifyEndTime(req.getModifyEndTime())
-                .pageIndex(req.getPageIndex())
-                .pageSize(req.getPageSize())
-                .build();
-
-        return page(pageReq);
+    public TbTotalPageDTO<TbPurchaseInDTO> process(TbPageReqDTO req) {
+        return TbPageUtil.totalPage(req, this::page);
     }
 
     public TbPageDTO<TbPurchaseInDTO> page(TbPageReqDTO req) {
