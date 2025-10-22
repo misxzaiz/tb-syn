@@ -81,10 +81,14 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
 
     @Override
     public void syncOnly(String cid) {
-        SynConfigDTO config = synConfigService.getTbSynConfigDTO(cid)
+        SynConfigDTO config = synConfigService.getSynConfigDTO(cid)
                 .orElse(SynConfigDTO.init(cid));
 
         PageReqDTO queryRequest = queryRequestBuilder.build(config);
+
+        config.setBeginSynTime(queryRequest.getModifyBeginTime());
+        config.setEndSynTime(queryRequest.getModifyEndTime());
+        synConfigService.saveSynConfigDTO(config);
 
         if (!shouldSync(queryRequest)) {
             log.info("同步时间未到达，cid: {}", cid);
@@ -102,12 +106,12 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
 
         // 更新同步状态
         config.setSynState(SynConfigDTO.SYN_ONE);
-        synConfigService.saveTbSynConfigDTO(config);
+        synConfigService.saveSynConfigDTO(config);
     }
 
     @Override
     public String getSyncStatus(String cid) {
-        return synConfigService.getTbSynConfigDTO(cid)
+        return synConfigService.getSynConfigDTO(cid)
                 .map(config -> "状态: " + config.getSynState() +
                              ", 开始时间: " + config.getBeginSynTime() +
                              ", 结束时间: " + config.getEndSynTime())

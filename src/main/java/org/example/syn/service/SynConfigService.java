@@ -15,11 +15,11 @@ public class SynConfigService {
     @Resource
     private RedisTemplate<String, SynConfigDTO> redisTemplate;
     
-    public void saveTbSynConfigDTO(SynConfigDTO tbSynConfigDTO) {
+    public void saveSynConfigDTO(SynConfigDTO tbSynConfigDTO) {
         redisTemplate.opsForValue().set(REDIS_KEY_PREFIX + tbSynConfigDTO.getCid(), tbSynConfigDTO);
     }
     
-    public Optional<SynConfigDTO> getTbSynConfigDTO(String cid) {
+    public Optional<SynConfigDTO> getSynConfigDTO(String cid) {
         SynConfigDTO json = redisTemplate.opsForValue().get(REDIS_KEY_PREFIX + cid);
         return Optional.ofNullable(json);
     }
