@@ -18,4 +18,9 @@ public class PurchaseSyncTemplate extends AbstractSyncTemplate<PurchaseInDTO> {
         return purchaseDataProcessor;
     }
 
+    @Override
+    protected Class<PurchaseInDTO> getDataType() {
+        return PurchaseInDTO.class;
+    }
+
 }

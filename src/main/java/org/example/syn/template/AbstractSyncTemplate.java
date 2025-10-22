@@ -1,133 +1,56 @@
 package org.example.syn.template;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.tb.model.TbPageReqDTO;
-import org.example.tb.model.TbSynConfigDTO;
-import org.example.tb.model.TbTotalPageDTO;
-import org.example.tb.model.TbTotalPageReqDTO;
+import org.example.syn.core.SyncEngine;
+import org.example.syn.core.SyncEngineFactory;
 import org.example.syn.processor.DataProcessor;
-import org.example.syn.service.SynConfigService;
-import org.example.syn.service.SynQueueService;
-import org.example.tb.util.TbPageUtil;
 
 import javax.annotation.Resource;
 import java.util.function.Consumer;
 
+/**
+ * 简化后的同步模板
+ * 作为适配器，保留原有接口，内部使用SyncEngine
+ */
 @Slf4j
 public abstract class AbstractSyncTemplate<T> {
-    
-    @Resource
-    protected SynConfigService synConfigService;
-    
-    @Resource
-    protected SynQueueService<T> synQueueService;
-    
-    public final void syncData(String cid) {
-        TbSynConfigDTO config = synConfigService.getTbSynConfigDTO(cid).orElse(TbSynConfigDTO.init(cid));
-        
-        TbPageReqDTO pageReq = buildPageRequest(config);
 
-        updateSyncConfigForSyncing(config, pageReq);
+    @Resource
+    private SyncEngineFactory syncEngineFactory;
 
-        if (TbPageReqDTO.SYN_TWO.equals(pageReq.getIsSyn())) {
-            log.info("同步时间未到达，等待中...");
-            return;
+    private SyncEngine<T> engine;
+
+    /**
+     * 获取同步引擎（懒加载）
+     */
+    private SyncEngine<T> getEngine() {
+        if (engine == null) {
+            engine = syncEngineFactory.getEngine(getDataType(), getDataProcessor());
         }
-        
-        TbTotalPageDTO<T> response = fetchData(pageReq);
-
-        pushDataToQueue(response, cid);
-        
-        config.setSynState(TbSynConfigDTO.SYN_ONE);
-        synConfigService.saveTbSynConfigDTO(config);
+        return engine;
     }
 
+    /**
+     * 保留原有接口，内部委托给SyncEngine
+     */
     public void syn(String cid, Consumer<T> dataConsumer) {
-        log.debug("开始同步数据...");
-        // 先检查有没有备份的数据
-        T bakData = synQueueService.get(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
-        if (bakData != null) {
-            log.debug("有备份数据，开始处理...");
-            processDataWithBackup(bakData, cid, dataConsumer);
-            log.debug("备份数据处理完成...");
-        }
-
-        T data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
-
-        if (data == null) {
-            log.debug("没有数据，开始同步...");
-            syncData(cid);
-            log.debug("同步完成...");
-        }
-
-
-        data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
-        if (data == null) {
-            log.debug("没有数据...");
-            return;
-        }
-
-        log.debug("开始处理数据...");
-        processDataWithBackup(data, cid, dataConsumer);
-
-        int count = 0;
-        while (true) {
-            if (++count > 100) {
-                return;
-            }
-            data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
-            if (data == null) {
-                log.debug("处理完成...");
-                return;
-            }
-            processDataWithBackup(data, cid, dataConsumer);
-        }
+        getEngine().syncAndConsume(cid, dataConsumer);
     }
-    
-    protected TbPageReqDTO buildPageRequest(TbSynConfigDTO config) {
-        boolean isFirstSync = isInitialState(config.getSynState());
-        return TbPageReqDTO.builder()
-                .modifyBeginTime(isFirstSync ? config.getBeginSynTime() : config.getEndSynTime())
-                .modifyEndTime(isFirstSync ? config.getEndSynTime() : null)
-                .synIntervalSecond(config.getSynIntervalSecond())
-                .build();
-    }
-    
-    protected TbTotalPageDTO<T> fetchData(TbPageReqDTO pageReq) {
-        DataProcessor<T> processor = getDataProcessor();
-        TbTotalPageReqDTO<T> req = TbTotalPageReqDTO.<T>builder()
-                .pageReq(pageReq)
-                .pageReqFunc(processor::process)
-                .build();
-        
-        return TbPageUtil.totalPage(req);
-    }
-    
-    private void updateSyncConfigForSyncing(TbSynConfigDTO config, TbPageReqDTO pageReq) {
-        config.setBeginSynTime(pageReq.getModifyBeginTime());
-        config.setEndSynTime(pageReq.getModifyEndTime());
-        config.setSynState(TbSynConfigDTO.SYN_THREE);
-        synConfigService.saveTbSynConfigDTO(config);
-    }
-    
-    private void pushDataToQueue(TbTotalPageDTO<T> response, String cid) {
-        if (response.getDatas() != null && !response.getDatas().isEmpty()) {
-            synQueueService.leftPush(SynQueueService.REDIS_QUEUE_PREFIX, cid, response.getDatas());
-        }
-    }
-    
-    private void processDataWithBackup(T data, String cid, Consumer<T> dataConsumer) {
-        if (dataConsumer != null) {
-            // 需要确定已消费
-            dataConsumer.accept(data);
-        }
 
-        synQueueService.remove(SynQueueService.REDIS_BAK_QUEUE_PREFIX, cid);
+    /**
+     * 保留原有接口
+     */
+    public final void syncData(String cid) {
+        getEngine().syncOnly(cid);
     }
-    
-    private boolean isInitialState(Integer synState) {
-        return TbSynConfigDTO.SYN_TWO.equals(synState) || TbSynConfigDTO.SYN_THREE.equals(synState);
-    }
-    
+
+    /**
+     * 子类需要实现：返回数据类型
+     */
+    protected abstract Class<T> getDataType();
+
+    /**
+     * 子类需要实现：返回数据处理器
+     */
     protected abstract DataProcessor<T> getDataProcessor();
 }
