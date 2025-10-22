@@ -62,6 +62,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
 
             // 继续处理剩余数据
             int count = 0;
+            // 大于100条，下次同步再执行
             while (count < 100) {
                 data = synQueueService.popAndBak(SynQueueService.REDIS_QUEUE_PREFIX, cid);
                 if (data == null) {
@@ -82,6 +83,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
 
         PageReqDTO queryRequest = PageReqDTO.build(config);
 
+        config.setSynState(SynConfigDTO.SYN_THREE);
         config.setBeginSynTime(queryRequest.getModifyBeginTime());
         config.setEndSynTime(queryRequest.getModifyEndTime());
         synConfigService.saveSynConfigDTO(config);
