@@ -114,4 +114,25 @@ public class PageReqDTO {
     public int getOffset() {
         return (pageIndex - 1) * pageSize;
     }
+
+    private static boolean isInitialState(Integer synState) {
+        return SynConfigDTO.SYN_TWO.equals(synState) ||
+                SynConfigDTO.SYN_THREE.equals(synState);
+    }
+
+    /**
+     * 根据同步配置构建查询请求
+     */
+    public static PageReqDTO build(SynConfigDTO config) {
+        boolean isFirstSync = isInitialState(config.getSynState());
+        String beginTime = isFirstSync ? config.getBeginSynTime() : config.getEndSynTime();
+        String endTime = isFirstSync ? config.getEndSynTime() : null;
+
+        return PageReqDTO.builder()
+                .cid(config.getCid())
+                .modifyBeginTime(beginTime)
+                .modifyEndTime(endTime)
+                .synIntervalSecond(config.getSynIntervalSecond())
+                .build();
+    }
 }

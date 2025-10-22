@@ -23,9 +23,6 @@ public class SyncEngineFactory {
     @Resource
     private SynQueueService<?> synQueueService;
 
-    @Resource
-    private QueryRequestBuilder queryRequestBuilder;
-
     private final Map<Class<?>, SyncEngine<?>> engineCache = new HashMap<>();
 
     /**
@@ -42,7 +39,6 @@ public class SyncEngineFactory {
         engine.setSynConfigService(synConfigService);
         engine.setSynQueueService((SynQueueService<T>) synQueueService);
         engine.setDataProcessor(processor);
-        engine.setQueryRequestBuilder(queryRequestBuilder);
         return engine;
     }
 }

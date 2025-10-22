@@ -20,7 +20,6 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
     private SynConfigService synConfigService;
     private SynQueueService<T> synQueueService;
     private DataProcessor<T> dataProcessor;
-    private QueryRequestBuilder queryRequestBuilder;
 
     // Setter方法用于依赖注入
     public void setSynConfigService(SynConfigService synConfigService) {
@@ -33,10 +32,6 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
 
     public void setDataProcessor(DataProcessor<T> dataProcessor) {
         this.dataProcessor = dataProcessor;
-    }
-
-    public void setQueryRequestBuilder(QueryRequestBuilder queryRequestBuilder) {
-        this.queryRequestBuilder = queryRequestBuilder;
     }
 
     @Override
@@ -84,7 +79,7 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
         SynConfigDTO config = synConfigService.getSynConfigDTO(cid)
                 .orElse(SynConfigDTO.init(cid));
 
-        PageReqDTO queryRequest = queryRequestBuilder.build(config);
+        PageReqDTO queryRequest = PageReqDTO.build(config);
 
         config.setBeginSynTime(queryRequest.getModifyBeginTime());
         config.setEndSynTime(queryRequest.getModifyEndTime());
