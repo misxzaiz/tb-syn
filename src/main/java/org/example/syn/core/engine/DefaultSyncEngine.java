@@ -8,6 +8,7 @@ import org.example.syn.core.model.PageReqDTO;
 import org.example.syn.core.model.SynConfigDTO;
 import org.example.syn.core.model.TotalPageDTO;
 import org.example.syn.core.processor.DataProcessor;
+import org.example.syn.core.util.DateUtil;
 
 import java.util.function.Consumer;
 
@@ -112,18 +113,9 @@ public class DefaultSyncEngine<T> implements SyncEngine<T> {
         synConfigService.saveSynConfigDTO(config);
     }
 
-    @Override
-    public String getSyncStatus(String cid) {
-        return synConfigService.getSynConfigDTO(cid)
-                .map(config -> "状态: " + config.getSynState() +
-                             ", 开始时间: " + config.getBeginSynTime() +
-                             ", 结束时间: " + config.getEndSynTime())
-                .orElse("未找到配置");
-    }
-
     private boolean shouldSync(PageReqDTO queryRequest) {
         // 这里可以添加更复杂的同步条件判断
-        return queryRequest.getModifyBeginTime() != null;
+        return !DateUtil.isAfterNow(queryRequest.getModifyEndTime());
     }
 
     private void processWithBackup(T data, String cid, Consumer<T> dataConsumer) {

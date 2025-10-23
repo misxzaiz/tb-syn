@@ -20,11 +20,4 @@ public interface SyncEngine<T> {
      * @param cid 租户ID
      */
     void syncOnly(String cid);
-
-    /**
-     * 获取同步状态
-     * @param cid 租户ID
-     * @return 同步状态描述
-     */
-    String getSyncStatus(String cid);
 }
