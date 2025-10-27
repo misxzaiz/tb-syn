@@ -15,21 +15,15 @@ public class LockController {
 
     @GetMapping("/tb")
     public String syncTbData() {
-        SimpleDistributedLock.LockHandle handle = lock.tryLock("tb:sync", 30000);
-        if (handle == null) {
-            return "同步任务正在执行中";
-        }
-
-        try {
+        lock.tryLockAndRun("tb:sync", () -> {
             // 模拟耗时任务
-            Thread.sleep(30000);
-            return "同步成功";
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return "同步中断";
-        } finally {
-            lock.unlock(handle);
-        }
+            try {
+                Thread.sleep(30000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return "同步完成";
     }
 
 }

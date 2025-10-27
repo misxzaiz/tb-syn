@@ -26,6 +26,31 @@ public class SimpleDistributedLock {
         this.renewExecutor = Executors.newScheduledThreadPool(1);
     }
 
+    public void tryLockAndRun(String key, Runnable run) {
+        LockHandle handle = tryLock(key);
+        if (handle == null) {
+            return;
+        }
+
+        try {
+            run.run();
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            unlock(handle);
+        }
+    }
+
+    /**
+     * 尝试获取锁（不可重入）
+     *
+     * @param key 锁的键名
+     * @return LockHandle 如果加锁成功则返回，否则为 null
+     */
+    public LockHandle tryLock(String key) {
+        return tryLock(key, 30000);
+    }
+
     /**
      * 尝试获取锁（不可重入）
      *
@@ -56,6 +81,9 @@ public class SimpleDistributedLock {
             return;
         }
 
+        // 先停止看门狗，防止解锁失败时继续续期
+        handle.stopRenewal();
+
         String lua = "if redis.call('get', KEYS[1]) == ARGV[1] then " +
                 "return redis.call('del', KEYS[1]) " +
                 "else return 0 end";
@@ -65,7 +93,6 @@ public class SimpleDistributedLock {
         script.setScriptText(lua);
 
         redisTemplate.execute(script, Collections.singletonList(handle.key), handle.value);
-        handle.stopRenewal();
     }
 
     @PreDestroy
