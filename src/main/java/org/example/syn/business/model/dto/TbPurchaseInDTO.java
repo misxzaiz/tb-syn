@@ -1,4 +1,4 @@
-package org.example.syn.model.dto;
+package org.example.syn.business.model.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

@@ -1,4 +1,4 @@
-package org.example.syn.service;
+package org.example.syn.business.service;
 
 import org.example.syn.core.api.SynQueueService;
 import org.slf4j.Logger;

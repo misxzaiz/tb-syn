@@ -4,17 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.syn.core.engine.SyncEngine;
 import org.example.syn.core.engine.SyncEngineFactory;
 import org.example.syn.lock.SimpleDistributedLock;
-import org.example.syn.processor.PurchaseDataProcessor;
-import org.example.syn.service.PurchaseInService;
-import org.example.syn.model.dto.TbPurchaseInDTO;
+import org.example.syn.business.processor.PurchaseDataProcessor;
+import org.example.syn.business.service.PurchaseInService;
+import org.example.syn.business.model.dto.TbPurchaseInDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Component

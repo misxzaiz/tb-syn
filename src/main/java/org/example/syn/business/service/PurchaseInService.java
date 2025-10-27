@@ -1,8 +1,8 @@
-package org.example.syn.service;
+package org.example.syn.business.service;
 
-import org.example.syn.model.entity.PurchaseIn;
-import org.example.syn.mapper.PurchaseInMapper;
-import org.example.syn.model.dto.TbPurchaseInDTO;
+import org.example.syn.business.model.entity.PurchaseIn;
+import org.example.syn.business.mapper.PurchaseInMapper;
+import org.example.syn.business.model.dto.TbPurchaseInDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

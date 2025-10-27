@@ -1,7 +1,7 @@
-package org.example.syn.processor;
+package org.example.syn.business.processor;
 
 import org.example.syn.core.processor.DataProcessor;
-import org.example.syn.model.dto.TbPurchaseInDTO;
+import org.example.syn.business.model.dto.TbPurchaseInDTO;
 import org.example.syn.core.model.PageDTO;
 import org.example.syn.core.model.PageReqDTO;
 import org.example.syn.core.model.TotalPageDTO;

@@ -1,8 +1,8 @@
-package org.example.syn.mapper;
+package org.example.syn.business.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.example.syn.model.entity.PurchaseIn;
+import org.example.syn.business.model.entity.PurchaseIn;
 
 import java.util.List;
 
