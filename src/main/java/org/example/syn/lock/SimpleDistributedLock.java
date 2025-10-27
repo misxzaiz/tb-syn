@@ -1,4 +1,4 @@
-package org.example.syn.demo.lock;
+package org.example.syn.lock;
 
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 不可重入的分布式锁（带自动续期）
- * 兼容 Spring Boot 2.3.x
  */
 @Component
 public class SimpleDistributedLock {
@@ -34,8 +33,6 @@ public class SimpleDistributedLock {
 
         try {
             run.run();
-        } catch (Exception e) {
-            Thread.currentThread().interrupt();
         } finally {
             unlock(handle);
         }
