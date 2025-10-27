@@ -1,4 +1,4 @@
-package org.example.syn.business.service;
+package org.example.syn.service;
 
 import org.example.syn.core.api.SynConfigService;
 import org.example.syn.core.model.SynConfigDTO;
