@@ -3,7 +3,24 @@
     "allow": [
       "Bash(tree src -I target)",
       "Bash(tree org -d -L 3)",
-      "Bash(tree src)"
+      "Bash(tree src)",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/api/SynConfigService.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/api/SynQueueService.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/engine/SyncEngine.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/engine/DefaultSyncEngine.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/engine/SyncEngineFactory.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/model/PageDTO.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/model/PageReqDTO.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/model/SynConfigDTO.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/model/TotalPageDTO.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/processor/DataProcessor.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/util/DateUtil.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/core/util/PageUtil.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/service/SynConfigServiceImpl.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/service/SynQueueServiceImpl.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/processor/PurchaseDataProcessor.java\")",
+      "Bash(cat \"/d/qusc/syn/src/main/java/org/example/syn/schedule/SynSchedule.java\")",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []
